@@ -12,7 +12,7 @@ export const STORE_INFO: StoreInfo = {
   displayPhone: "+91 99621 19810",
   alternatePhone: "+91 95000 14516",
   millPhone: "+91 98402 80459 / +91 83002 30459",
-  email: "srivenkateswaaraarisimandy@gmail.com",
+  email: "srivenkateswaraarisimandy@gmail.com",
   address: "No.5, VOC Nagar, Kundrathur Main Road, Chiikkarayapuram, Chennai - 600069",
   mandiAddressTamil: "எண்.5, வ.உ.சி நகர், குன்றத்தூர் மெயின்ரோடு, சிக்கராயபுரம், சென்னை - 600 069",
   millName: "Sri Venkateswara Modern Rice Mill",
