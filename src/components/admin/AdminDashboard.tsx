@@ -26,7 +26,8 @@ import {
   MessageCircle,
   AlertCircle,
   Sparkles,
-  Settings
+  Settings,
+  RotateCcw
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/common/Icons';
 
@@ -44,6 +45,8 @@ interface AdminDashboardProps {
   onBackToStore: () => void;
   onOpenBannerManager?: () => void;
   offerBanners?: OfferBanner[];
+  onDeleteBanner?: (id: string) => Promise<void>;
+  onResetBanners?: () => Promise<void>;
 }
 
 const STATUS_STAGES = [
@@ -61,6 +64,8 @@ export default function AdminDashboard({
   onBackToStore,
   onOpenBannerManager,
   offerBanners = [],
+  onDeleteBanner,
+  onResetBanners,
 }: AdminDashboardProps) {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -69,6 +74,10 @@ export default function AdminDashboard({
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+
+  // Active Admin Section Tab ('orders' or 'banners')
+  const [adminTab, setAdminTab] = useState<'orders' | 'banners'>('orders');
+  const [deletingBannerId, setDeletingBannerId] = useState<string | null>(null);
 
   // Dashboard Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -190,6 +199,37 @@ export default function AdminDashboard({
   const handleDelete = async (orderId: string) => {
     if (window.confirm(`Are you sure you want to permanently delete Order #${orderId}?`)) {
       await onDeleteOrder(orderId);
+    }
+  };
+
+  // Delete Banner Handler
+  const handleDeleteBannerItem = async (bannerId: string, headline?: string) => {
+    if (window.confirm(`Are you sure you want to permanently remove the banner "${headline || 'this banner'}" from the storefront?`)) {
+      if (onDeleteBanner) {
+        setDeletingBannerId(bannerId);
+        try {
+          await onDeleteBanner(bannerId);
+        } catch (e) {
+          console.error(e);
+          alert('Failed to remove banner. Please try again.');
+        } finally {
+          setDeletingBannerId(null);
+        }
+      }
+    }
+  };
+
+  // Reset Banners Handler
+  const handleResetBannersAction = async () => {
+    if (window.confirm('Reset all offer banners back to the default factory mill slides?')) {
+      if (onResetBanners) {
+        try {
+          await onResetBanners();
+        } catch (e) {
+          console.error(e);
+          alert('Failed to reset banners. Please try again.');
+        }
+      }
     }
   };
 
@@ -421,87 +461,314 @@ export default function AdminDashboard({
           </div>
         </div>
 
-        {/* Secret Dashboard - Spotlight Banner Controller Card */}
-        <div className="bg-gradient-to-r from-[#0C2B1D] via-[#143D2B] to-[#0C2B1D] p-4 sm:p-5 rounded-2xl border border-[#C59B27]/40 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-white">
-          <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-[#C59B27]/20 border border-[#C59B27]/50 flex items-center justify-center text-[#FFD875] shrink-0">
-              <Sparkles className="w-5 h-5 text-[#C59B27]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono bg-[#C59B27] text-[#0C2B1D] font-black uppercase px-2 py-0.5 rounded">
-                  Private Admin Tool
-                </span>
-                <span className="text-xs text-[#FFD875] font-bold">
-                  {offerBanners.length} Live Spotlight Banners
-                </span>
-              </div>
-              <h3 className="font-serif font-bold text-base text-white mt-0.5">
-                Spotlight Offer Banners &amp; Category Slides
-              </h3>
-              <p className="text-xs text-[#D5E6DC]">
-                Add or edit slides, update headline discounts, link products, or reset to mill defaults safely from this dashboard.
-              </p>
-            </div>
-          </div>
-
-          {onOpenBannerManager && (
-            <button
-              onClick={onOpenBannerManager}
-              className="px-5 py-2.5 rounded-xl bg-[#C59B27] hover:bg-[#dfb441] text-[#0C2B1D] text-xs font-black transition flex items-center gap-2 shadow-lg cursor-pointer shrink-0"
+        {/* Navigation Tabs: Orders vs Spotlight Banners */}
+        <div className="flex items-center gap-2 border-b border-[#E6E2D8] pb-1">
+          <button
+            type="button"
+            onClick={() => setAdminTab('orders')}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
+              adminTab === 'orders'
+                ? 'bg-[#133E2B] text-white shadow-sm'
+                : 'bg-white text-gray-600 hover:text-[#133E2B] border border-gray-200'
+            }`}
+          >
+            <Package className="w-4 h-4 text-[#C59B27]" />
+            <span>Orders &amp; Dispatch</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                adminTab === 'orders'
+                  ? 'bg-[#C59B27] text-[#0C2B1D]'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
             >
-              <Settings className="w-4 h-4" />
-              <span>Launch Banner Manager</span>
-            </button>
-          )}
+              {orders.length}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setAdminTab('banners')}
+            className={`px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 transition cursor-pointer ${
+              adminTab === 'banners'
+                ? 'bg-[#133E2B] text-white shadow-sm'
+                : 'bg-white text-gray-600 hover:text-[#133E2B] border border-gray-200'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 text-[#C59B27]" />
+            <span>Spotlight Banners</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
+                adminTab === 'banners'
+                  ? 'bg-[#C59B27] text-[#0C2B1D]'
+                  : 'bg-gray-100 text-gray-700'
+              }`}
+            >
+              {offerBanners.length}
+            </span>
+          </button>
         </div>
 
-        {/* Real-time Order Metrics Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
-              <span>Total Orders</span>
-              <Package className="w-4 h-4 text-[#C59B27]" />
-            </div>
-            <div className="font-serif text-2xl sm:text-3xl font-black text-[#133E2B]">
-              {metrics.totalOrders}
-            </div>
-            <p className="text-[11px] text-gray-400">Lifetime mill orders logged</p>
-          </div>
+        {/* TAB 1: SPOTLIGHT BANNERS CONTROLLER & REMOVAL VIEW */}
+        {adminTab === 'banners' && (
+          <div className="space-y-5 animate-fade-in">
+            {/* Banner Management Header Card */}
+            <div className="bg-gradient-to-r from-[#0C2B1D] via-[#143D2B] to-[#0C2B1D] p-5 sm:p-6 rounded-3xl border border-[#C59B27]/40 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-white">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-[#C59B27]/20 border border-[#C59B27]/50 flex items-center justify-center text-[#FFD875] shrink-0">
+                  <Sparkles className="w-6 h-6 text-[#C59B27]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono bg-[#C59B27] text-[#0C2B1D] font-black uppercase px-2 py-0.5 rounded">
+                      Live Storefront Controller
+                    </span>
+                    <span className="text-xs text-[#FFD875] font-bold">
+                      {offerBanners.length} Active Slides
+                    </span>
+                  </div>
+                  <h2 className="font-serif font-bold text-xl text-white mt-1">
+                    Manage &amp; Remove Spotlight Banners
+                  </h2>
+                  <p className="text-xs text-[#D5E6DC]">
+                    Remove unwanted slides, upload new promotions, or restore factory defaults. Changes sync instantly to customers.
+                  </p>
+                </div>
+              </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
-              <span>Total Sales Volume</span>
-              <span className="text-[#133E2B] font-bold">₹</span>
-            </div>
-            <div className="font-serif text-2xl sm:text-3xl font-black text-[#133E2B]">
-              ₹{metrics.totalRevenue.toLocaleString('en-IN')}
-            </div>
-            <p className="text-[11px] text-emerald-600 font-semibold">Doorstep COD / UPI collections</p>
-          </div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                {onResetBanners && (
+                  <button
+                    type="button"
+                    onClick={handleResetBannersAction}
+                    className="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                    title="Restore default mill slides"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5 text-[#C59B27]" />
+                    <span>Reset Defaults</span>
+                  </button>
+                )}
 
-          <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
-              <span>In Transit / Pending</span>
-              <Truck className="w-4 h-4 text-purple-600" />
+                {onOpenBannerManager && (
+                  <button
+                    type="button"
+                    onClick={onOpenBannerManager}
+                    className="px-4 py-2.5 rounded-xl bg-[#C59B27] hover:bg-[#dfb441] text-[#0C2B1D] text-xs font-black transition flex items-center gap-1.5 shadow-md cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 text-[#0C2B1D]" />
+                    <span>+ Add New Banner</span>
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="font-serif text-2xl sm:text-3xl font-black text-purple-700">
-              {metrics.pendingCount}
-            </div>
-            <p className="text-[11px] text-purple-600 font-semibold">{metrics.inTransitCount} currently en route</p>
-          </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
-            <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
-              <span>Completed Deliveries</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="font-serif text-2xl sm:text-3xl font-black text-emerald-700">
-              {metrics.deliveredCount}
-            </div>
-            <p className="text-[11px] text-emerald-600 font-semibold">Successfully handed over</p>
+            {/* List of Active Banners with One-Click Remove Button */}
+            {offerBanners.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {offerBanners.map((banner, index) => {
+                  const isDeleting = deletingBannerId === banner.id;
+                  return (
+                    <div
+                      key={banner.id || index}
+                      className="bg-white rounded-2xl border border-[#E6E2D8] shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between"
+                    >
+                      {/* Banner Image Preview */}
+                      <div className="relative h-44 bg-gray-100 overflow-hidden border-b border-gray-100">
+                        <img
+                          src={banner.image}
+                          alt={banner.headline}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-2 left-2 flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-black uppercase tracking-wider bg-[#C59B27] text-[#0C2B1D] px-2 py-0.5 rounded shadow-sm">
+                            {banner.discount || 'Special Offer'}
+                          </span>
+                          {banner.badge && (
+                            <span className="text-[10px] font-bold bg-[#133E2B] text-white px-2 py-0.5 rounded shadow-sm">
+                              {banner.badge}
+                            </span>
+                          )}
+                        </div>
+                        <div className="absolute bottom-2 right-2">
+                          <span className="text-[10px] font-bold bg-black/70 backdrop-blur-xs text-white px-2 py-0.5 rounded font-mono">
+                            Slide #{index + 1}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Banner Information Body */}
+                      <div className="p-4 space-y-2.5 flex-1 flex flex-col justify-between">
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between text-[11px] text-gray-500">
+                            <span className="font-semibold text-[#133E2B] truncate">
+                              {banner.brand || 'Heritage Mill'}
+                            </span>
+                            <span className="bg-gray-100 px-2 py-0.5 rounded font-mono text-[10px] text-gray-700">
+                              Pack: {banner.weight || '26kg'}
+                            </span>
+                          </div>
+
+                          <h3 className="font-serif font-bold text-sm text-[#133E2B] leading-snug line-clamp-2">
+                            {banner.headline}
+                          </h3>
+
+                          <div className="pt-1 text-[11px] text-gray-600 bg-[#FBF9F5] p-2 rounded-lg border border-gray-200/80">
+                            <span className="text-gray-400 block text-[10px] uppercase font-bold">
+                              Linked Product:
+                            </span>
+                            <span className="font-semibold text-[#133E2B] truncate block">
+                              {banner.productId}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Banner Action Bar */}
+                        <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Live on Storefront
+                          </span>
+
+                          <button
+                            type="button"
+                            disabled={isDeleting}
+                            onClick={() => handleDeleteBannerItem(banner.id, banner.headline)}
+                            className="px-3.5 py-1.5 rounded-xl bg-red-50 hover:bg-red-600 text-red-700 hover:text-white border border-red-200 hover:border-red-600 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                            title="Remove this banner from homepage spotlight carousel"
+                          >
+                            {isDeleting ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                <span>Removing...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Remove Banner</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl border border-gray-200 p-12 text-center text-gray-500 space-y-3">
+                <Sparkles className="w-12 h-12 mx-auto text-[#C59B27]/60" />
+                <h3 className="font-serif font-bold text-base text-[#133E2B]">
+                  No Spotlight Banners Found
+                </h3>
+                <p className="text-xs text-gray-600 max-w-md mx-auto">
+                  All banners have been removed. You can create a new spotlight banner or restore the mill default slides.
+                </p>
+                <div className="pt-2 flex items-center justify-center gap-3">
+                  {onResetBanners && (
+                    <button
+                      type="button"
+                      onClick={handleResetBannersAction}
+                      className="px-4 py-2 rounded-xl bg-[#133E2B] text-white text-xs font-bold hover:bg-[#1C523B] transition cursor-pointer"
+                    >
+                      Restore Factory Defaults
+                    </button>
+                  )}
+                  {onOpenBannerManager && (
+                    <button
+                      type="button"
+                      onClick={onOpenBannerManager}
+                      className="px-4 py-2 rounded-xl bg-[#C59B27] text-[#0C2B1D] text-xs font-black hover:bg-[#dfb441] transition cursor-pointer"
+                    >
+                      + Add New Banner
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* TAB 2: ORDERS & DELIVERY DISPATCH CONTROLLER */}
+        {adminTab === 'orders' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Quick Banner Status Strip */}
+            <div className="bg-gradient-to-r from-[#0C2B1D] via-[#143D2B] to-[#0C2B1D] p-4 rounded-2xl border border-[#C59B27]/40 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#C59B27]/20 border border-[#C59B27]/50 flex items-center justify-center text-[#FFD875] shrink-0">
+                  <Sparkles className="w-4 h-4 text-[#C59B27]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-mono bg-[#C59B27] text-[#0C2B1D] font-black uppercase px-1.5 py-0.5 rounded">
+                      Spotlight Offers
+                    </span>
+                    <span className="text-xs text-[#FFD875] font-bold">
+                      {offerBanners.length} Live Banners Active
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#D5E6DC]">
+                    Need to remove or edit promotional slides on the storefront?
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAdminTab('banners')}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#C59B27] hover:bg-[#dfb441] text-[#0C2B1D] text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-[#0C2B1D]" />
+                  <span>View &amp; Remove Banners</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Real-time Order Metrics Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
+                  <span>Total Orders</span>
+                  <Package className="w-4 h-4 text-[#C59B27]" />
+                </div>
+                <div className="font-serif text-2xl sm:text-3xl font-black text-[#133E2B]">
+                  {metrics.totalOrders}
+                </div>
+                <p className="text-[11px] text-gray-400">Lifetime mill orders logged</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
+                  <span>Total Sales Volume</span>
+                  <span className="text-[#133E2B] font-bold">₹</span>
+                </div>
+                <div className="font-serif text-2xl sm:text-3xl font-black text-[#133E2B]">
+                  ₹{metrics.totalRevenue.toLocaleString('en-IN')}
+                </div>
+                <p className="text-[11px] text-emerald-600 font-semibold">Doorstep COD / UPI collections</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
+                  <span>In Transit / Pending</span>
+                  <Truck className="w-4 h-4 text-purple-600" />
+                </div>
+                <div className="font-serif text-2xl sm:text-3xl font-black text-purple-700">
+                  {metrics.pendingCount}
+                </div>
+                <p className="text-[11px] text-purple-600 font-semibold">{metrics.inTransitCount} currently en route</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-2xl border border-[#E6E2D8] shadow-xs space-y-1">
+                <div className="flex items-center justify-between text-gray-500 text-xs font-semibold">
+                  <span>Completed Deliveries</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                </div>
+                <div className="font-serif text-2xl sm:text-3xl font-black text-emerald-700">
+                  {metrics.deliveredCount}
+                </div>
+                <p className="text-[11px] text-emerald-600 font-semibold">Successfully handed over</p>
+              </div>
+            </div>
 
         {/* Filter and Search Bar */}
         <div className="bg-white p-4 rounded-2xl border border-[#E6E2D8] shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
@@ -774,6 +1041,8 @@ export default function AdminDashboard({
             </div>
           )}
         </div>
+          </div>
+        )}
 
       </div>
     </div>

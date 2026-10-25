@@ -790,6 +790,8 @@ export default function Home() {
             onBackToStore={() => handleNavigate('home')}
             onOpenBannerManager={() => setIsBannerManagerOpen(true)}
             offerBanners={offerBanners}
+            onDeleteBanner={handleDeleteBanner}
+            onResetBanners={handleResetBanners}
           />
         )}
       </main>
