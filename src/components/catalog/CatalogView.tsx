@@ -72,8 +72,8 @@ export default function CatalogView({
   }, [products, selectedCategory, searchQuery, inStockOnly, sortBy]);
 
   return (
-    <div className="py-8 bg-[#FBF9F5] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-6 sm:py-8 bg-[#FBF9F5] min-h-screen">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
         
         {/* Header & Controls */}
         <div className="mb-6 space-y-4">
@@ -197,9 +197,9 @@ export default function CatalogView({
           )}
         </div>
 
-        {/* Product Grid */}
+        {/* Product Grid - 2 columns on mobile, 3-4 columns on tablet/desktop */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
             {filteredProducts.map((p) => {
               const cartCount = cartItemsCountMap[p.id] || 0;
               return (
