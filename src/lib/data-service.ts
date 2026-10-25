@@ -26,6 +26,45 @@ import { supabase } from './supabase';
 // DATABASE MAPPERS (Translates Supabase SQL snake_case to Frontend camelCase)
 // =============================================================================
 
+function mapProductFromRow(row: any): Product {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    origin: row.origin || 'Direct Mill Supply',
+    aging: row.aging || 'Naturally Aged',
+    description: row.description || '',
+    image: row.image,
+    badge: row.badge || '',
+    rating: Number(row.rating || 4.9),
+    reviewCount: Number(row.review_count || 1),
+    inStock: row.in_stock !== false,
+    defaultWeight: row.default_weight || '26kg',
+    weights: Array.isArray(row.weights) && row.weights.length > 0
+      ? row.weights
+      : [{ weight: '26kg', price: 1800, originalPrice: 2000, inStock: true }],
+  };
+}
+
+function mapProductToRow(prod: Product): any {
+  return {
+    id: prod.id,
+    name: prod.name,
+    category: prod.category,
+    origin: prod.origin || '',
+    aging: prod.aging || '',
+    description: prod.description || '',
+    image: prod.image,
+    badge: prod.badge || null,
+    rating: prod.rating || 4.9,
+    review_count: prod.reviewCount || 1,
+    in_stock: prod.inStock,
+    default_weight: prod.defaultWeight || '26kg',
+    weights: prod.weights || [],
+    updated_at: new Date().toISOString(),
+  };
+}
+
 function mapOrderFromRow(row: any): Order {
   return {
     orderId: row.order_id,
@@ -118,21 +157,65 @@ function mapBannerToRow(banner: OfferBanner): any {
 }
 
 // =============================================================================
-// STORE & CATALOG SERVICES
+// STORE & CATALOG SERVICES (SUPABASE + LOCAL STORAGE CACHE)
 // =============================================================================
+const PRODUCTS_STORAGE_KEY = 'rice_ecommerce_products_v1';
 
 export async function getStoreInfo(): Promise<StoreInfo> {
   return STORE_INFO;
 }
 
-export async function getCategories(): Promise<Category[]> {
+export async function getAllProducts(): Promise<Product[]> {
+  // 1. Try Supabase if table exists
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const cloudProducts = data.map(mapProductFromRow);
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(cloudProducts));
+          } catch {}
+        }
+        return cloudProducts;
+      }
+    } catch {
+      // Fallback to local storage or seed data
+    }
+  }
+
+  // 2. Check localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem(PRODUCTS_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to read products from localStorage:', e);
+    }
+  }
+
+  // 3. Fallback to default seed PRODUCTS
+  return PRODUCTS;
+}
+
+export async function getCategories(customProducts?: Product[]): Promise<Category[]> {
+  const prods = customProducts || (await getAllProducts());
   return CATEGORIES.map(cat => {
     if (cat.id === 'all') {
-      return { ...cat, count: PRODUCTS.length };
+      return { ...cat, count: prods.length };
     }
     return {
       ...cat,
-      count: PRODUCTS.filter(p => p.category === cat.id).length
+      count: prods.filter(p => p.category === cat.id).length
     };
   });
 }
@@ -143,7 +226,7 @@ export async function getProducts(options?: {
   maxPrice?: number;
   inStockOnly?: boolean;
 }): Promise<Product[]> {
-  let list = [...PRODUCTS];
+  let list = await getAllProducts();
 
   if (options?.category && options.category !== 'all') {
     list = list.filter(p => p.category === options.category);
@@ -160,7 +243,7 @@ export async function getProducts(options?: {
   }
 
   if (options?.maxPrice !== undefined) {
-    list = list.filter(p => p.weights[0].price <= options.maxPrice!);
+    list = list.filter(p => (p.weights[0]?.price || 0) <= options.maxPrice!);
   }
 
   if (options?.inStockOnly) {
@@ -171,7 +254,73 @@ export async function getProducts(options?: {
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {
-  return PRODUCTS.find(p => p.id === id);
+  const list = await getAllProducts();
+  return list.find(p => p.id === id);
+}
+
+export async function saveProduct(product: Product): Promise<Product[]> {
+  const current = await getAllProducts();
+  const existingIdx = current.findIndex(p => p.id === product.id);
+  let updated: Product[];
+
+  if (existingIdx >= 0) {
+    updated = current.map((p, idx) => (idx === existingIdx ? product : p));
+  } else {
+    updated = [product, ...current];
+  }
+
+  // Attempt Supabase upsert
+  if (supabase) {
+    try {
+      const row = mapProductToRow(product);
+      await supabase.from('products').upsert([row]);
+    } catch (e) {
+      console.warn('Supabase save product failed:', e);
+    }
+  }
+
+  // Persist to localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to save products to localStorage:', e);
+    }
+  }
+
+  return updated;
+}
+
+export async function deleteProduct(id: string): Promise<Product[]> {
+  const current = await getAllProducts();
+  const updated = current.filter(p => p.id !== id);
+
+  if (supabase) {
+    try {
+      await supabase.from('products').delete().eq('id', id);
+    } catch (e) {
+      console.warn('Supabase delete product failed:', e);
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to delete product from localStorage:', e);
+    }
+  }
+
+  return updated;
+}
+
+export async function resetProducts(): Promise<Product[]> {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem(PRODUCTS_STORAGE_KEY);
+    } catch {}
+  }
+  return PRODUCTS;
 }
 
 // =============================================================================

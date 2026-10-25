@@ -44,6 +44,9 @@ import {
   getStoreInfo,
   getCategories,
   getProducts,
+  saveProduct,
+  deleteProduct,
+  resetProducts,
   getOfferBanners,
   saveOfferBanner,
   deleteOfferBanner,
@@ -419,6 +422,31 @@ export default function Home() {
     showToast('Banners restored to factory defaults.');
   };
 
+  // Product Catalog Handlers (Admin)
+  const handleSaveProduct = async (productData: Product) => {
+    const updated = await saveProduct(productData);
+    setProducts(updated);
+    const updatedCats = await getCategories(updated);
+    setCategories(updatedCats);
+    showToast(`Product "${productData.name}" saved successfully!`);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    const updated = await deleteProduct(id);
+    setProducts(updated);
+    const updatedCats = await getCategories(updated);
+    setCategories(updatedCats);
+    showToast('Product removed from catalog.');
+  };
+
+  const handleResetProducts = async () => {
+    const updated = await resetProducts();
+    setProducts(updated);
+    const updatedCats = await getCategories(updated);
+    setCategories(updatedCats);
+    showToast('Product catalog restored to factory defaults.');
+  };
+
   // User Review Handlers
   const handleOpenWriteReview = (productId?: string) => {
     setReviewProductId(productId);
@@ -792,6 +820,11 @@ export default function Home() {
             offerBanners={offerBanners}
             onDeleteBanner={handleDeleteBanner}
             onResetBanners={handleResetBanners}
+            products={products}
+            categories={categories}
+            onSaveProduct={handleSaveProduct}
+            onDeleteProduct={handleDeleteProduct}
+            onResetProducts={handleResetProducts}
           />
         )}
       </main>
