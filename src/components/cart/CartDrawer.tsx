@@ -122,12 +122,12 @@ export default function CartDrawer({
   const itemSavings = originalSubtotal - subtotal;
 
   const couponDiscount = appliedCoupon ? appliedCoupon.discount : 0;
-  const platformFee = subtotal > 0 ? 10 : 0; // Discounted from 23 to 10
-  const codFee = 0; // Discounted from 10 to 0
-  const deliveryFee = subtotal >= storeInfo.freeDeliveryThreshold || subtotal === 0 ? 0 : 70;
+  const platformFee = 0; // ₹0 FREE Platform Fee
+  const codFee = 0; // ₹0 FREE COD
+  const deliveryFee = 0; // ₹0 FREE Doorstep Delivery across Chennai
 
-  const finalTotal = Math.max(0, subtotal - couponDiscount + platformFee + codFee + deliveryFee);
-  const freeShippingDelta = Math.max(0, storeInfo.freeDeliveryThreshold - subtotal);
+  const finalTotal = Math.max(0, subtotal - couponDiscount);
+  const freeShippingDelta = 0;
 
   // Apply Coupon Logic
   const handleApplyCoupon = (e: React.FormEvent) => {
@@ -209,9 +209,9 @@ export default function CartDrawer({
     if (appliedCoupon) {
       text += `\nCoupon (${appliedCoupon.code}): -₹${appliedCoupon.discount}`;
     }
-    text += `\nPlatform Fee: ₹${platformFee} (Special Offer)`;
+    text += `\nPlatform Fee: ₹0 (FREE)`;
+    text += `\nDelivery Fee (Chennai): ₹0 (FREE Doorstep Delivery)`;
     text += `\nCOD Fee: ₹0 (FREE)`;
-    text += `\nDelivery Fee (Chennai): ${deliveryFee === 0 ? 'FREE' : '₹' + deliveryFee}`;
     text += `\n*TOTAL PAYABLE (COD / UPI): ₹${finalTotal}*`;
     text += `\n\n_Vanakkam! Please confirm dispatch schedule to Chennai doorstep. Payment via Cash/UPI on arrival._`;
 
@@ -268,30 +268,13 @@ export default function CartDrawer({
             </span>
           </div>
 
-          {/* Free Shipping Progress Indicator */}
+          {/* Free Shipping & ₹0 Platform Fee Banner */}
           {cartItems.length > 0 && (
-            <div className="bg-[#FEF9EB] border-b border-[#E6CE8A] px-6 py-2 text-xs text-[#A27B16]">
-              {freeShippingDelta > 0 ? (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between font-bold text-[11px]">
-                    <span>Add ₹{freeShippingDelta} more for FREE Chennai Delivery!</span>
-                    <span>₹{subtotal} / ₹{storeInfo.freeDeliveryThreshold}</span>
-                  </div>
-                  <div className="w-full bg-[#E6CE8A]/40 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#C59B27] h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${Math.min(100, (subtotal / storeInfo.freeDeliveryThreshold) * 100)}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-[11px]">
-                  <Truck className="w-4 h-4 text-emerald-600" />
-                  <span>Congratulations! You unlocked FREE Chennai Doorstep Delivery!</span>
-                </div>
-              )}
+            <div className="bg-[#EAF3EE] border-b border-emerald-200 px-6 py-2 text-xs text-emerald-800">
+              <div className="flex items-center gap-2 font-bold text-[11px]">
+                <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>100% FREE Chennai Doorstep Delivery &amp; ₹0 Platform Fee Unlocked!</span>
+              </div>
             </div>
           )}
 
@@ -429,7 +412,7 @@ export default function CartDrawer({
                   <span>
                     Platform Fee <span className="line-through text-gray-400">₹23</span>:
                   </span>
-                  <span className="font-bold text-[#133E2B]">₹{platformFee}</span>
+                  <span className="font-bold text-emerald-700">₹0 FREE</span>
                 </div>
                 <div className="flex justify-between">
                   <span>
@@ -438,9 +421,11 @@ export default function CartDrawer({
                   <span className="font-bold text-emerald-700">₹0 FREE</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Delivery Charge:</span>
-                  <span className={deliveryFee === 0 ? 'text-emerald-700 font-bold' : 'font-semibold'}>
-                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                  <span>
+                    Doorstep Delivery <span className="line-through text-gray-400">₹70</span>:
+                  </span>
+                  <span className="text-emerald-700 font-bold">
+                    ₹0 FREE
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-gray-900 pt-2 border-t border-gray-300">

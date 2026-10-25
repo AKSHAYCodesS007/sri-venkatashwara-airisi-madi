@@ -281,9 +281,9 @@ export default function Home() {
     const weightObj =
       product.weights.find((w) => w.weight === weight) || product.weights[0];
     const itemTotal = weightObj.price * quantity;
-    const deliveryFee = itemTotal >= storeInfo.freeDeliveryThreshold ? 0 : 70;
-    const platformFee = 10;
-    const finalTotal = itemTotal + deliveryFee + platformFee;
+    const deliveryFee = 0; // ₹0 FREE Doorstep Delivery across Chennai
+    const platformFee = 0; // ₹0 FREE Platform Fee
+    const finalTotal = itemTotal;
 
     // Retrieve saved guest delivery details if available
     let guestInfo = { name: '', phone: '', address: '', area: '', pincode: '600' };
@@ -351,8 +351,8 @@ export default function Home() {
     text += `\n*ITEMS ORDERED:*\n`;
     text += `1. *${product.name}* (${weight})\n   Qty: ${quantity} bag(s) @ ₹${weightObj.price} = ₹${itemTotal}\n`;
     text += `\nSubtotal: ₹${itemTotal}`;
-    text += `\nPlatform Fee: ₹${platformFee} (Special Offer)`;
-    text += `\nDelivery Fee (Chennai): ${deliveryFee === 0 ? 'FREE' : '₹' + deliveryFee}`;
+    text += `\nPlatform Fee: ₹0 (FREE)`;
+    text += `\nDelivery Fee (Chennai): ₹0 (FREE Doorstep Delivery)`;
     text += `\n*TOTAL PAYABLE (COD / UPI): ₹${finalTotal}*`;
     text += `\n\n_Vanakkam! Please confirm dispatch schedule to Chennai doorstep. Payment via Cash/UPI on arrival._`;
 
@@ -788,6 +788,8 @@ export default function Home() {
             onUpdateOrderStatus={handleUpdateOrderStatus}
             onDeleteOrder={handleDeleteOrder}
             onBackToStore={() => handleNavigate('home')}
+            onOpenBannerManager={() => setIsBannerManagerOpen(true)}
+            offerBanners={offerBanners}
           />
         )}
       </main>

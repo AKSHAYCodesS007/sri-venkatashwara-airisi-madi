@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Order, StoreInfo } from '@/types';
+import { Order, StoreInfo, OfferBanner } from '@/types';
 import {
   ShieldCheck,
   Lock,
@@ -24,7 +24,9 @@ import {
   SlidersHorizontal,
   Home,
   MessageCircle,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  Settings
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/common/Icons';
 
@@ -40,6 +42,8 @@ interface AdminDashboardProps {
   ) => Promise<void>;
   onDeleteOrder: (orderId: string) => Promise<void>;
   onBackToStore: () => void;
+  onOpenBannerManager?: () => void;
+  offerBanners?: OfferBanner[];
 }
 
 const STATUS_STAGES = [
@@ -55,6 +59,8 @@ export default function AdminDashboard({
   onUpdateOrderStatus,
   onDeleteOrder,
   onBackToStore,
+  onOpenBannerManager,
+  offerBanners = [],
 }: AdminDashboardProps) {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -386,6 +392,17 @@ export default function AdminDashboard({
               <span>Encrypted Session</span>
             </div>
 
+            {onOpenBannerManager && (
+              <button
+                onClick={onOpenBannerManager}
+                className="px-3.5 py-2 rounded-xl bg-[#C59B27] hover:bg-[#dfb441] text-[#0C2B1D] text-xs font-black transition flex items-center gap-1.5 shadow-md cursor-pointer"
+                title="Manage customer spotlight banners, headline texts, images & offers"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5 text-[#0C2B1D]" />
+                <span>Manage Spotlight Banners</span>
+              </button>
+            )}
+
             <button
               onClick={onBackToStore}
               className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
@@ -402,6 +419,41 @@ export default function AdminDashboard({
               <span>Logout</span>
             </button>
           </div>
+        </div>
+
+        {/* Secret Dashboard - Spotlight Banner Controller Card */}
+        <div className="bg-gradient-to-r from-[#0C2B1D] via-[#143D2B] to-[#0C2B1D] p-4 sm:p-5 rounded-2xl border border-[#C59B27]/40 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 text-white">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-[#C59B27]/20 border border-[#C59B27]/50 flex items-center justify-center text-[#FFD875] shrink-0">
+              <Sparkles className="w-5 h-5 text-[#C59B27]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono bg-[#C59B27] text-[#0C2B1D] font-black uppercase px-2 py-0.5 rounded">
+                  Private Admin Tool
+                </span>
+                <span className="text-xs text-[#FFD875] font-bold">
+                  {offerBanners.length} Live Spotlight Banners
+                </span>
+              </div>
+              <h3 className="font-serif font-bold text-base text-white mt-0.5">
+                Spotlight Offer Banners &amp; Category Slides
+              </h3>
+              <p className="text-xs text-[#D5E6DC]">
+                Add or edit slides, update headline discounts, link products, or reset to mill defaults safely from this dashboard.
+              </p>
+            </div>
+          </div>
+
+          {onOpenBannerManager && (
+            <button
+              onClick={onOpenBannerManager}
+              className="px-5 py-2.5 rounded-xl bg-[#C59B27] hover:bg-[#dfb441] text-[#0C2B1D] text-xs font-black transition flex items-center gap-2 shadow-lg cursor-pointer shrink-0"
+            >
+              <Settings className="w-4 h-4" />
+              <span>Launch Banner Manager</span>
+            </button>
+          )}
         </div>
 
         {/* Real-time Order Metrics Cards */}

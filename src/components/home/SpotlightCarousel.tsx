@@ -18,7 +18,7 @@ interface SpotlightCarouselProps {
   banners: OfferBanner[];
   onSelectProduct: (productId: string, weight?: string) => void;
   onSelectCategory: (categoryId: string) => void;
-  onOpenBannerManager: () => void;
+  onOpenBannerManager?: () => void;
 }
 
 export default function SpotlightCarousel({
@@ -87,34 +87,44 @@ export default function SpotlightCarousel({
       <div className="max-w-7xl mx-auto relative z-10 space-y-2.5 sm:space-y-4">
         {/* Top Fee Ribbon / Exclusivity Badge */}
         <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-[#174630] via-[#1F5C40] to-[#174630] border border-[#C59B27]/40 rounded-lg sm:rounded-xl px-2.5 sm:px-4 py-1.5 sm:py-2.5 shadow-md">
-          <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-sm font-bold tracking-wide truncate">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs font-bold tracking-wide truncate">
             <span className="p-0.5 sm:p-1 rounded bg-[#C59B27] text-[#0C2B1D] shadow-xs shrink-0">
-              <BadgePercent className="w-3 h-3 sm:w-4 sm:h-4" />
+              <BadgePercent className="w-3 h-3 sm:w-4 sm:h-4 text-[#0C2B1D]" />
             </span>
-            <span className="text-[#F5E6BF] font-extrabold hidden xs:inline">MILL SAVINGS:</span>
-            <span className="text-white bg-black/30 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs border border-white/10 shrink-0">
-              Fee <span className="line-through text-red-300">₹23</span>{' '}
-              <strong className="text-[#4ADE80]">₹10</strong>
+            <span className="text-[#F5E6BF] font-extrabold hidden xs:inline">EXCLUSIVE MILL SAVINGS:</span>
+            
+            {/* 0 Platform Fee */}
+            <span className="text-white bg-black/35 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs border border-white/10 shrink-0">
+              Platform Fee: <span className="line-through text-red-300">₹23</span>{' '}
+              <strong className="text-[#4ADE80]">₹0 FREE</strong>
             </span>
+            
             <span className="text-white/40 hidden sm:inline">•</span>
-            <span className="text-white bg-black/30 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs border border-white/10 shrink-0">
-              COD <strong className="text-[#4ADE80]">FREE</strong>
+            
+            {/* 0 Delivery Fee */}
+            <span className="text-white bg-black/35 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs border border-white/10 shrink-0">
+              Delivery Fee: <span className="line-through text-red-300">₹70</span>{' '}
+              <strong className="text-[#4ADE80]">₹0 FREE</strong>
             </span>
-            <span className="text-[10px] sm:text-xs bg-[#C59B27]/20 text-[#FFD875] border border-[#C59B27]/50 px-2 py-0.5 rounded-full font-bold ml-1 hidden md:inline-flex items-center gap-1">
+            
+            <span className="text-white/40 hidden md:inline">•</span>
+            
+            <span className="text-white bg-black/35 px-1.5 sm:px-2 py-0.5 rounded text-[10px] sm:text-xs border border-white/10 shrink-0 hidden md:inline">
+              COD: <strong className="text-[#4ADE80]">FREE</strong>
+            </span>
+            
+            <span className="text-[10px] sm:text-xs bg-[#C59B27]/20 text-[#FFD875] border border-[#C59B27]/50 px-2 py-0.5 rounded-full font-bold ml-1 hidden lg:inline-flex items-center gap-1">
               💵 DIRECT WHOLESALE
             </span>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={onOpenBannerManager}
-              className="text-[10px] sm:text-xs font-semibold text-[#FFD875] hover:text-white bg-white/10 hover:bg-white/20 border border-[#C59B27]/40 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center gap-1 transition cursor-pointer"
-              title="Manage banner promotions"
-            >
-              <Settings className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C59B27]" />
-              <span className="hidden sm:inline">Manage Offers</span>
-              <span className="sm:hidden">Edit</span>
-            </button>
+          {/* Right Badge - Pure Wholesale Mill Assurance (Admin edit button removed from public storefront) */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[9px] sm:text-[11px] font-bold text-[#FFD875] bg-black/30 border border-[#C59B27]/40 px-2 py-0.5 rounded-md flex items-center gap-1">
+              <Sparkles className="w-2.5 h-2.5 text-[#C59B27]" />
+              <span className="hidden xs:inline">Zero Middlemen</span>
+              <span className="xs:hidden">Wholesale</span>
+            </span>
           </div>
         </div>
 
