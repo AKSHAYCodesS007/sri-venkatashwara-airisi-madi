@@ -23,6 +23,14 @@
   --color-border: #e6e2d8;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+  position: relative;
+}
+
 body {
   background-color: var(--color-bg-warm);
   color: var(--color-text-main);

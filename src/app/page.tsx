@@ -480,7 +480,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBF9F5] text-[#19241F] selection:bg-[#C59B27] selection:text-[#0C2B1D]">
+    <div className="min-h-screen flex flex-col bg-[#FBF9F5] text-[#19241F] selection:bg-[#C59B27] selection:text-[#0C2B1D] overflow-x-hidden w-full max-w-full">
       
       {/* Toast Notification */}
       {toastMessage && (

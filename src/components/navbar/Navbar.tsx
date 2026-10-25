@@ -61,29 +61,30 @@ export default function Navbar({
   return (
     <>
       {/* Top Bar / Mill Notice */}
-      <div className="bg-[#0C2B1D] text-[#E6E2D8] text-xs py-1.5 px-4 border-b border-[#1C523B]">
-        <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-[#C59B27] text-[#0C2B1D] px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1 shadow-xs">
-              <ShieldCheck className="w-3 h-3" />
-              Wholesale Mandy &amp; Modern Mill
+      <div className="bg-[#0C2B1D] text-[#E6E2D8] text-xs py-1.5 px-2.5 sm:px-4 border-b border-[#1C523B] w-full max-w-full overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <span className="bg-[#C59B27] text-[#0C2B1D] px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1 shadow-xs shrink-0">
+              <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+              <span className="hidden xs:inline">Wholesale Mandy &amp; Mill</span>
+              <span className="xs:hidden">Mill Mandy</span>
             </span>
-            <span className="text-[11px] sm:text-xs text-[#FFD875] font-semibold tracking-wide">
+            <span className="text-[10px] sm:text-xs text-[#FFD875] font-semibold tracking-wide truncate">
               || {storeInfo.invocation || "ஸ்ரீ குழந்தை அம்மன் துணை"} ||
             </span>
-            <span className="hidden lg:inline text-[11px] text-[#D5E6DC]">
+            <span className="hidden lg:inline text-[11px] text-[#D5E6DC] truncate">
               • 26kg Direct Mill Sacks • Exclusively Delivering Across Chennai City &amp; Suburbs
             </span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 text-[11px] text-[#AECDBB]">
+          <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] text-[#AECDBB] shrink-0">
             <a
               href={`tel:${storeInfo.whatsappNumber}`}
               className="flex items-center gap-1 hover:text-white transition"
             >
-              <Phone className="w-3 h-3 text-[#C59B27]" />
-              <span>
-                Mandi: <strong className="text-white font-semibold">99621 19810</strong>
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#C59B27]" />
+              <span className="whitespace-nowrap">
+                <span className="hidden xs:inline">Mandi: </span><strong className="text-white font-semibold">99621 19810</strong>
               </span>
             </a>
             <span className="hidden sm:inline text-white/30">|</span>
@@ -109,36 +110,36 @@ export default function Navbar({
       </div>
 
       {/* Main Sticky Navbar */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E6E2D8] shadow-xs transition-all">
-        <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 h-20 flex items-center justify-between gap-2 sm:gap-3">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E6E2D8] shadow-xs transition-all w-full max-w-full overflow-hidden">
+        <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 h-16 sm:h-20 flex items-center justify-between gap-1.5 sm:gap-3">
           
-          {/* Logo */}
+          {/* Logo & Brand Title */}
           <div
             onClick={() => handleNav('home')}
-            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group select-none shrink-0"
+            className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group select-none min-w-0 flex-1"
           >
-            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#FBF9F5] border border-[#C59B27]/70 p-1 flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:border-[#C59B27] transition-all overflow-hidden shrink-0">
+            <div className="relative w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-[#FBF9F5] border border-[#C59B27]/70 p-0.5 sm:p-1 flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:border-[#C59B27] transition-all overflow-hidden shrink-0">
               <img
                 src={storeInfo.logo || "/images/logo.png"}
                 alt={storeInfo.name}
                 className="w-full h-full object-contain"
               />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-serif text-sm sm:text-base lg:text-lg font-black tracking-tight text-[#133E2B] whitespace-nowrap">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1">
+                <span className="font-serif text-[11px] xs:text-xs sm:text-base lg:text-lg font-black tracking-tight text-[#133E2B] leading-tight truncate block">
                   {storeInfo.name}
                 </span>
-                <span className="hidden 2xl:inline-block text-[9px] bg-[#FEF9EB] text-[#A27B16] border border-[#E6CE8A] px-1 py-0.2 rounded font-bold uppercase tracking-wider">
+                <span className="hidden 2xl:inline-block text-[9px] bg-[#FEF9EB] text-[#A27B16] border border-[#E6CE8A] px-1 py-0.2 rounded font-bold uppercase tracking-wider shrink-0">
                   Estd. {storeInfo.established}
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <p className="text-[10px] sm:text-[11px] text-[#133E2B] font-bold tracking-wide flex items-center gap-1 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#C59B27]"></span>
-                  <span>{storeInfo.tamilName || "ஸ்ரீ வெங்கடேஸ்வரா அரிசி மண்டி"}</span>
+              <div className="flex items-center gap-1">
+                <p className="text-[9px] sm:text-[11px] text-[#133E2B] font-bold tracking-wide flex items-center gap-1 leading-tight truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C59B27] shrink-0"></span>
+                  <span className="truncate">{storeInfo.tamilName || "ஸ்ரீ வெங்கடேஸ்வரா அரிசி மண்டி"}</span>
                 </p>
-                <span className="text-[10px] text-[#A27B16] font-bold uppercase tracking-wider hidden 2xl:inline">
+                <span className="text-[10px] text-[#A27B16] font-bold uppercase tracking-wider hidden 2xl:inline shrink-0">
                   • Rice Wholesale
                 </span>
               </div>
@@ -233,35 +234,33 @@ export default function Navbar({
             {/* WhatsApp Quick Order Button - Always Visible */}
             <button
               onClick={onWhatsAppOrder}
-              className="shrink-0 inline-flex items-center gap-1.5 sm:gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-2.5 sm:px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm transition-all duration-150 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+              className="shrink-0 inline-flex items-center gap-1 sm:gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold shadow-xs hover:shadow transition-all duration-150 cursor-pointer active:scale-95"
               title={
                 totalCartCount > 0
                   ? `Take ${totalCartCount} selected item(s) to WhatsApp`
                   : 'Order directly on WhatsApp'
               }
             >
-              <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
+              <WhatsAppIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" />
               <span className="hidden sm:inline">
                 {totalCartCount > 0 ? `WhatsApp (${totalCartCount})` : 'WhatsApp Order'}
               </span>
-              <span className="sm:hidden">
+              <span className="sm:hidden text-[11px] font-bold">
                 {totalCartCount > 0 ? `WA (${totalCartCount})` : 'WA'}
               </span>
-              {totalCartCount > 0 && (
-                <span className="w-2 h-2 rounded-full bg-white animate-pulse hidden xl:inline-block"></span>
-              )}
             </button>
 
             {/* WhatsApp Order Bag Button - Always Visible */}
             <button
               onClick={onOpenCart}
-              className="shrink-0 relative px-2.5 sm:px-3.5 py-2 rounded-xl bg-[#133E2B] hover:bg-[#1C523B] text-white flex items-center gap-1.5 sm:gap-2 text-xs font-bold transition shadow-sm hover:shadow cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              className="shrink-0 relative px-2 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl bg-[#133E2B] hover:bg-[#1C523B] text-white flex items-center gap-1 sm:gap-2 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
               title="View WhatsApp Order Bag"
+              aria-label="View Order Bag"
             >
-              <ShoppingCart className="w-4 h-4 text-[#C59B27] shrink-0" />
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] shrink-0" />
               <span className="hidden sm:inline">Bag</span>
               {totalCartCount > 0 && (
-                <span className="bg-[#C59B27] text-[#0C2B1D] text-[10px] sm:text-[11px] font-extrabold px-1.5 py-0.5 rounded-full min-w-[18px] text-center shadow-xs">
+                <span className="bg-[#C59B27] text-[#0C2B1D] text-[9px] sm:text-[11px] font-extrabold px-1.5 py-0.2 rounded-full min-w-[16px] text-center shadow-xs">
                   {totalCartCount}
                 </span>
               )}
@@ -270,10 +269,10 @@ export default function Navbar({
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 rounded-xl border border-[#E6E2D8] text-[#19241F] hover:bg-gray-100 transition cursor-pointer shrink-0"
+              className="xl:hidden p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-[#E6E2D8] text-[#19241F] hover:bg-gray-100 transition cursor-pointer shrink-0"
               aria-label="Toggle Navigation"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
             </button>
           </div>
         </div>

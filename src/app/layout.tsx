@@ -24,14 +24,20 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${plusJakarta.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans bg-[#FBF9F5] text-[#19241F]">
+    <html lang="en" className={`${playfair.variable} ${plusJakarta.variable} overflow-x-hidden max-w-full w-full`}>
+      <body className="min-h-screen flex flex-col font-sans bg-[#FBF9F5] text-[#19241F] overflow-x-hidden max-w-full w-full">
         {children}
       </body>
     </html>
