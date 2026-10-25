@@ -159,7 +159,7 @@ function mapBannerToRow(banner: OfferBanner): any {
 // =============================================================================
 // STORE & CATALOG SERVICES (SUPABASE + LOCAL STORAGE CACHE)
 // =============================================================================
-const PRODUCTS_STORAGE_KEY = 'rice_ecommerce_products_v1';
+const PRODUCTS_STORAGE_KEY = 'rice_ecommerce_products_v2';
 
 export async function getStoreInfo(): Promise<StoreInfo> {
   return STORE_INFO;

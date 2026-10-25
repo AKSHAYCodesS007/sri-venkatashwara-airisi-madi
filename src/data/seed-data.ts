@@ -415,45 +415,6 @@ export const PRODUCTS: Product[] = [
     ]
   },
   {
-    id: "basmati-royal-1121",
-    name: "Royal 1121 XXL Basmati Rice",
-    category: "basmati-rice",
-    origin: "Tarkhanwala, Punjab",
-    aging: "24 Months Aged",
-    description: "Extra long raw grain extending up to 22mm when cooked. Delicate natural aroma, non-sticky pearlescent texture, perfect for celebratory dum biryanis and special occasions.",
-    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80",
-    badge: "Best Seller",
-    rating: 4.9,
-    reviewCount: 342,
-    inStock: true,
-    defaultWeight: "5kg",
-    weights: [
-      { weight: "1kg", price: 165, originalPrice: 195 },
-      { weight: "5kg", price: 775, originalPrice: 950 },
-      { weight: "10kg", price: 1490, originalPrice: 1850 },
-      { weight: "25kg", price: 3450, originalPrice: 4200 }
-    ]
-  },
-  {
-    id: "kurnool-sona-masuri-aged",
-    name: "Aged Kurnool Sona Masuri (HMT Raw)",
-    category: "raw-rice",
-    origin: "Tungabhadra River Basin, Kurnool",
-    aging: "18 Months Naturally Cured",
-    description: "Lightweight, easy on the stomach, low-starch everyday rice. Fluffs up into soft, separate grains that absorb rasam, dal, and sambar without turning mushy.",
-    image: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=800&q=80",
-    badge: "Direct Mill",
-    rating: 4.8,
-    reviewCount: 521,
-    inStock: true,
-    defaultWeight: "25kg",
-    weights: [
-      { weight: "5kg", price: 340, originalPrice: 395 },
-      { weight: "10kg", price: 660, originalPrice: 760 },
-      { weight: "25kg", price: 1550, originalPrice: 1800 }
-    ]
-  },
-  {
     id: "seeraga-samba-dindigul",
     name: "Dindigul Seeraga Samba (Jeera Rice)",
     category: "raw-rice",
@@ -470,25 +431,6 @@ export const PRODUCTS: Product[] = [
       { weight: "1kg", price: 145, originalPrice: 175 },
       { weight: "5kg", price: 690, originalPrice: 820 },
       { weight: "10kg", price: 1320, originalPrice: 1590 }
-    ]
-  },
-  {
-    id: "thanjavur-ponni-boiled",
-    name: "Thanjavur Deluxe Boiled Ponni",
-    category: "boiled-rice",
-    origin: "Cauvery Delta, Thanjavur",
-    aging: "14 Months Aged",
-    description: "Steamed parboiled grain with rich nutritional retention. High satiety, non-sticky, resilient texture suitable for lunch boxes, curd rice, and daily meals.",
-    image: "https://images.unsplash.com/photo-1568651316345-f0931168f121?auto=format&fit=crop&w=800&q=80",
-    badge: "Family Staple",
-    rating: 4.7,
-    reviewCount: 264,
-    inStock: true,
-    defaultWeight: "25kg",
-    weights: [
-      { weight: "5kg", price: 360, originalPrice: 410 },
-      { weight: "10kg", price: 690, originalPrice: 790 },
-      { weight: "25kg", price: 1620, originalPrice: 1890 }
     ]
   },
   {
@@ -549,25 +491,6 @@ export const PRODUCTS: Product[] = [
     ]
   },
   {
-    id: "organic-brown-sona-masuri",
-    name: "Single-Estate Unpolished Brown Rice",
-    category: "organic-rice",
-    origin: "Raichur Organic Belt, Karnataka",
-    aging: "10 Months Naturally Stored",
-    description: "100% whole grain with nutrient-dense outer germ and bran intact. Nutty flavor, low glycemic index, wholesome choice for mindful wellness and diabetes diet.",
-    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=800&q=80",
-    badge: "100% Unpolished",
-    rating: 4.6,
-    reviewCount: 119,
-    inStock: true,
-    defaultWeight: "5kg",
-    weights: [
-      { weight: "1kg", price: 110, originalPrice: 130 },
-      { weight: "5kg", price: 520, originalPrice: 610 },
-      { weight: "10kg", price: 990, originalPrice: 1180 }
-    ]
-  },
-  {
     id: "traditional-gobindobhog",
     name: "Bengal Short Grain Gobindobhog",
     category: "raw-rice",
@@ -583,57 +506,6 @@ export const PRODUCTS: Product[] = [
     weights: [
       { weight: "1kg", price: 155, originalPrice: 180 },
       { weight: "5kg", price: 740, originalPrice: 870 }
-    ]
-  },
-  {
-    id: "bulk-25kg-kurnool-burlap",
-    name: "25kg Burlap Sack - Kurnool Sona Masuri",
-    category: "raw-rice",
-    origin: "Tungabhadra River Basin",
-    aging: "Guaranteed 18 Months Old Crop",
-    description: "Heavy traditional jute burlap sack for residential families and caterers. Direct mill dispatch with moisture-proof inner seal and free doorstep carriage.",
-    image: "https://images.unsplash.com/photo-1536304993881-ff6e9eefa2a6?auto=format&fit=crop&w=800&q=80",
-    badge: "Wholesale Price",
-    rating: 4.9,
-    reviewCount: 420,
-    inStock: true,
-    defaultWeight: "25kg",
-    weights: [
-      { weight: "25kg", price: 1550, originalPrice: 1850 }
-    ]
-  },
-  {
-    id: "bulk-25kg-1121-xxl-sack",
-    name: "25kg Caterer's Sack - Royal 1121 Basmati",
-    category: "basmati-rice",
-    origin: "Punjab Mandi Direct",
-    aging: "2 Years Godown Cured",
-    description: "Bulk 25kg commercial sack for weddings, large joint families, and catering masters. Uniform grain length with minimum broken grains.",
-    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80",
-    badge: "Banquet Grade",
-    rating: 4.9,
-    reviewCount: 215,
-    inStock: true,
-    defaultWeight: "25kg",
-    weights: [
-      { weight: "25kg", price: 3450, originalPrice: 4200 }
-    ]
-  },
-  {
-    id: "bulk-25kg-thanjavur-boiled-sack",
-    name: "25kg Family Sack - Thanjavur Boiled Ponni",
-    category: "boiled-rice",
-    origin: "Delta Co-operative Mills",
-    aging: "14 Months Aged",
-    description: "Heavy 25kg laminated bag of pure Cauvery Delta boiled rice. Zero impurities, stones, or dust. Cleaned with 3-stage destoners.",
-    image: "https://images.unsplash.com/photo-1568651316345-f0931168f121?auto=format&fit=crop&w=800&q=80",
-    badge: "Direct Freight",
-    rating: 4.8,
-    reviewCount: 188,
-    inStock: true,
-    defaultWeight: "25kg",
-    weights: [
-      { weight: "25kg", price: 1620, originalPrice: 1950 }
     ]
   }
 ];
