@@ -413,10 +413,7 @@ export const PRODUCTS: Product[] = [
     weights: [
       { weight: "25kg", price: 2000, originalPrice: 2200, inStock: true }
     ]
-  }
-];
-
-export const SAMPLE_PRODUCTS: Product[] = [
+  },
   {
     id: "basmati-royal-1121",
     name: "Royal 1121 XXL Basmati Rice",
@@ -640,6 +637,8 @@ export const SAMPLE_PRODUCTS: Product[] = [
     ]
   }
 ];
+
+export const SAMPLE_PRODUCTS: Product[] = PRODUCTS;
 
 export const DEFAULT_OFFER_BANNERS: OfferBanner[] = [
   {

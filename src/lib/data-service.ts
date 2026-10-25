@@ -166,6 +166,8 @@ export async function getStoreInfo(): Promise<StoreInfo> {
 }
 
 export async function getAllProducts(): Promise<Product[]> {
+  let cloudProducts: Product[] = [];
+
   // 1. Try Supabase if table exists
   if (supabase) {
     try {
@@ -175,13 +177,7 @@ export async function getAllProducts(): Promise<Product[]> {
         .order('name', { ascending: true });
 
       if (!error && Array.isArray(data) && data.length > 0) {
-        const cloudProducts = data.map(mapProductFromRow);
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(cloudProducts));
-          } catch {}
-        }
-        return cloudProducts;
+        cloudProducts = data.map(mapProductFromRow);
       }
     } catch {
       // Fallback to local storage or seed data
@@ -189,13 +185,14 @@ export async function getAllProducts(): Promise<Product[]> {
   }
 
   // 2. Check localStorage
+  let localProducts: Product[] = [];
   if (typeof window !== 'undefined') {
     try {
       const saved = localStorage.getItem(PRODUCTS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          localProducts = parsed;
         }
       }
     } catch (e) {
@@ -203,8 +200,25 @@ export async function getAllProducts(): Promise<Product[]> {
     }
   }
 
-  // 3. Fallback to default seed PRODUCTS
-  return PRODUCTS;
+  // Base list prioritizing cloud, then local storage
+  const baseList = cloudProducts.length > 0 ? cloudProducts : (localProducts.length > 0 ? localProducts : []);
+
+  // Guarantee that default seed PRODUCTS are never missing
+  const existingMap = new Map<string, Product>();
+  baseList.forEach(p => existingMap.set(p.id, p));
+
+  const merged = [
+    ...baseList,
+    ...PRODUCTS.filter(p => !existingMap.has(p.id))
+  ];
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(merged));
+    } catch {}
+  }
+
+  return merged;
 }
 
 export async function getCategories(customProducts?: Product[]): Promise<Category[]> {
