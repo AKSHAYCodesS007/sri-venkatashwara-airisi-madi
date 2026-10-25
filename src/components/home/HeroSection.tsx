@@ -25,25 +25,25 @@ export default function HeroSection({
   totalCartCount = 0,
 }: HeroSectionProps) {
   return (
-    <section className="relative bg-[#FBF9F5] pt-10 pb-12 border-b border-[#E6E2D8] overflow-hidden">
+    <section className="relative bg-[#FBF9F5] pt-6 sm:pt-10 pb-8 sm:pb-12 border-b border-[#E6E2D8] overflow-hidden">
       {/* Decorative gradient glow */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#C59B27]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-10 w-80 h-80 bg-[#133E2B]/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
           
           {/* Left Column: Brand Story & Call to Actions */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-6">
             
             {/* Super Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#EAF3EE] border border-[#133E2B]/20 text-[#133E2B] text-xs font-bold tracking-wide shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#C59B27] animate-pulse"></span>
-              <span>|| ஸ்ரீ குழந்தை அம்மன் துணை || Rice Wholesale Merchant • Exclusively in Chennai</span>
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#EAF3EE] border border-[#133E2B]/20 text-[#133E2B] text-[10px] sm:text-xs font-bold tracking-wide shadow-2xs">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C59B27] animate-pulse"></span>
+              <span className="truncate">|| ஸ்ரீ குழந்தை அம்மன் துணை || Rice Wholesale Merchant • Exclusively in Chennai</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#133E2B] tracking-tight leading-[1.18]">
+            <h1 className="font-serif text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#133E2B] tracking-tight leading-snug sm:leading-[1.18]">
               Direct Mill-Fresh Rice,{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C59B27] to-[#A27B16]">
                 Wholesale 26kg Sacks
@@ -52,51 +52,51 @@ export default function HeroSection({
             </h1>
 
             {/* Subtext */}
-            <p className="text-sm sm:text-base text-[#56645C] leading-relaxed max-w-2xl font-normal">
+            <p className="text-xs sm:text-base text-[#56645C] leading-relaxed max-w-2xl font-normal">
               Direct from <strong>Sri Venkateshwara Arisi Mandy</strong> (Kundrathur Main Road, Chiikkarayapuram) and <strong>Sri Venkateswara Modern Rice Mill</strong> (Kolapakkam). Pure, sortex-cleaned Boiled, Steam, Raw, and Idly rice in authentic 26kg sacks delivered exclusively to homes and kitchens across Chennai.
             </p>
 
             {/* Quality Seals List */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#19241F]">
-                <CheckCircle2 className="w-4 h-4 text-[#C59B27] flex-shrink-0" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 pt-0.5 sm:pt-1">
+              <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-[#19241F]">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] flex-shrink-0" />
                 <span>Zero Liquid Paraffin or Chemical Polish</span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#19241F]">
-                <CheckCircle2 className="w-4 h-4 text-[#C59B27] flex-shrink-0" />
+              <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-[#19241F]">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] flex-shrink-0" />
                 <span>Milled &amp; Cleaned Only Upon Order</span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#19241F]">
-                <CheckCircle2 className="w-4 h-4 text-[#C59B27] flex-shrink-0" />
+              <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-[#19241F]">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] flex-shrink-0" />
                 <span>Direct Mill Wholesale Pricing</span>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#19241F]">
-                <CheckCircle2 className="w-4 h-4 text-[#C59B27] flex-shrink-0" />
+              <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-[#19241F]">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] flex-shrink-0" />
                 <span>Doorstep Delivery Across Chennai City Only</span>
               </div>
             </div>
 
             {/* Primary Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1 sm:pt-2">
               <button
                 onClick={onNavigateToCatalog}
-                className="px-6 py-3.5 rounded-xl bg-[#133E2B] hover:bg-[#1C523B] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                className="px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl bg-[#133E2B] hover:bg-[#1C523B] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
               >
-                <ShoppingBag className="w-4 h-4 text-[#C59B27]" />
+                <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27]" />
                 <span>Browse Rice Catalog</span>
-                <ArrowRight className="w-4 h-4 ml-1" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
               </button>
 
               <button
                 onClick={onWhatsAppOrder}
-                className="px-5 py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
+                className="px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-bold shadow-xs hover:shadow-md transition flex items-center gap-2 cursor-pointer hover:scale-[1.02]"
                 title={
                   totalCartCount > 0
                     ? `Take ${totalCartCount} item(s) to WhatsApp`
                     : 'Select products on website to order via WhatsApp'
                 }
               >
-                <WhatsAppIcon className="w-4 h-4 text-white" />
+                <WhatsAppIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                 <span>
                   {totalCartCount > 0
                     ? `Take ${totalCartCount} Item(s) to WhatsApp`
@@ -109,7 +109,7 @@ export default function HeroSection({
           {/* Right Column: Hero Visual Showcase */}
           <div className="lg:col-span-5">
             <div className="relative rounded-2xl md:rounded-3xl overflow-hidden border border-[#C59B27]/40 shadow-xl bg-white p-2">
-              <div className="relative h-72 sm:h-80 md:h-96 rounded-xl md:rounded-2xl overflow-hidden">
+              <div className="relative h-56 sm:h-80 md:h-96 rounded-xl md:rounded-2xl overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=1000&q=80"
                   alt="Aged Royal Basmati and Sona Masuri Grains"
