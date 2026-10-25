@@ -31,12 +31,23 @@ export default function SpotlightCarousel({
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Touch & Swipe Gesture State for Mobile
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+  const touchEndXRef = useRef<number | null>(null);
+  const touchEndYRef = useRef<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = useState<number>(0);
+  const [isSwiping, setIsSwiping] = useState<boolean>(false);
+  const isDraggingRef = useRef<boolean>(false);
+
+  const minSwipeDistance = 35; // minimum horizontal distance in px to trigger slide
+
   const safeBanners = banners && banners.length > 0 ? banners : [];
   const currentBanner = safeBanners[currentIndex] || safeBanners[0];
 
   // Auto-advance logic
   useEffect(() => {
-    if (safeBanners.length <= 1 || isPaused) return;
+    if (safeBanners.length <= 1 || isPaused || isSwiping) return;
 
     timerRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % safeBanners.length);
@@ -45,22 +56,126 @@ export default function SpotlightCarousel({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [safeBanners.length, isPaused]);
+  }, [safeBanners.length, isPaused, isSwiping]);
 
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handlePrev = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (safeBanners.length <= 1) return;
     setCurrentIndex((prev) => (prev - 1 + safeBanners.length) % safeBanners.length);
   };
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleNext = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (safeBanners.length <= 1) return;
     setCurrentIndex((prev) => (prev + 1) % safeBanners.length);
   };
 
+  // Mobile Touch Handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (safeBanners.length <= 1) return;
+    setIsPaused(true);
+    touchStartXRef.current = e.targetTouches[0].clientX;
+    touchStartYRef.current = e.targetTouches[0].clientY;
+    touchEndXRef.current = null;
+    touchEndYRef.current = null;
+    setIsSwiping(true);
+    setTouchDeltaX(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const currentX = e.targetTouches[0].clientX;
+    const currentY = e.targetTouches[0].clientY;
+    touchEndXRef.current = currentX;
+    touchEndYRef.current = currentY;
+
+    const diffX = currentX - touchStartXRef.current;
+    const diffY = currentY - touchStartYRef.current;
+
+    // Apply horizontal offset when predominantly moving horizontally
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      const cappedDelta = Math.max(-80, Math.min(80, diffX));
+      setTouchDeltaX(cappedDelta);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsPaused(false);
+    setIsSwiping(false);
+
+    if (
+      touchStartXRef.current !== null &&
+      touchEndXRef.current !== null &&
+      touchStartYRef.current !== null &&
+      touchEndYRef.current !== null
+    ) {
+      const diffX = touchStartXRef.current - touchEndXRef.current;
+      const diffY = touchStartYRef.current - touchEndYRef.current;
+
+      // Horizontal swipe detected
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > minSwipeDistance) {
+        if (diffX > 0) {
+          // Swiped left -> Next slide
+          handleNext();
+        } else {
+          // Swiped right -> Previous slide
+          handlePrev();
+        }
+      }
+    }
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+    touchEndXRef.current = null;
+    touchEndYRef.current = null;
+    setTouchDeltaX(0);
+  };
+
+  // Mouse Drag Handlers for Desktop Touchpad / DevTools Simulation
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (safeBanners.length <= 1) return;
+    setIsPaused(true);
+    isDraggingRef.current = true;
+    touchStartXRef.current = e.clientX;
+    touchStartYRef.current = e.clientY;
+    touchEndXRef.current = null;
+    touchEndYRef.current = null;
+    setIsSwiping(true);
+    setTouchDeltaX(0);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current || touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const currentX = e.clientX;
+    const currentY = e.clientY;
+    touchEndXRef.current = currentX;
+    touchEndYRef.current = currentY;
+
+    const diffX = currentX - touchStartXRef.current;
+    const diffY = currentY - touchStartYRef.current;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      const cappedDelta = Math.max(-80, Math.min(80, diffX));
+      setTouchDeltaX(cappedDelta);
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    handleTouchEnd();
+  };
+
+  const handleContainerClick = (e: React.MouseEvent) => {
+    if (Math.abs(touchDeltaX) > 10) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
   const handleExploreCategory = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (Math.abs(touchDeltaX) > 10) return;
     if (currentBanner?.category) {
       onSelectCategory(currentBanner.category);
     } else if (currentBanner?.productId) {
@@ -70,6 +185,7 @@ export default function SpotlightCarousel({
 
   const handleQuickViewProduct = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (Math.abs(touchDeltaX) > 10) return;
     if (currentBanner?.productId) {
       onSelectProduct(currentBanner.productId, currentBanner.weight);
     }
@@ -159,9 +275,22 @@ export default function SpotlightCarousel({
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Inner Carousel Content */}
+          {/* Inner Carousel Content with Mobile Swipe & Touch Support */}
           <div
-            className="group relative bg-gradient-to-br from-[#0A2317] via-[#0F3523] to-[#081B12] rounded-[10px] sm:rounded-[14px] md:rounded-[22px] overflow-hidden select-none transition-transform duration-300"
+            className="group relative bg-gradient-to-br from-[#0A2317] via-[#0F3523] to-[#081B12] rounded-[10px] sm:rounded-[14px] md:rounded-[22px] overflow-hidden select-none touch-pan-y cursor-grab active:cursor-grabbing"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onClick={handleContainerClick}
+            style={{
+              transform: isSwiping && touchDeltaX !== 0 ? `translateX(${touchDeltaX * 0.45}px)` : 'none',
+              transition: isSwiping ? 'none' : 'transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
           >
             {/* Banner Media & Content Grid */}
             <div className="grid grid-cols-12 min-h-[160px] xs:min-h-[180px] sm:min-h-[240px] md:min-h-[380px] lg:min-h-[420px]">
@@ -257,33 +386,39 @@ export default function SpotlightCarousel({
               </div>
             </div>
 
-            {/* Left & Right Arrow Navigation Controls */}
+            {/* Left & Right Arrow Navigation Controls (Responsive for Touch and Desktop) */}
             {safeBanners.length > 1 && (
               <>
                 <button
+                  type="button"
                   onClick={handlePrev}
-                  className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/60 hover:bg-[#C59B27] hover:text-[#0C2B1D] text-white backdrop-blur-md border border-white/30 items-center justify-center transition-all opacity-85 hover:opacity-100 hover:scale-110 shadow-lg z-20 cursor-pointer"
+                  className="flex absolute left-1 sm:left-3 top-1/2 -translate-y-1/2 w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-black/60 hover:bg-[#C59B27] hover:text-[#0C2B1D] text-white backdrop-blur-md border border-white/20 sm:border-white/30 items-center justify-center transition-all opacity-75 sm:opacity-85 hover:opacity-100 active:scale-90 hover:scale-110 shadow-lg z-20 cursor-pointer"
                   aria-label="Previous Category Banner"
                 >
-                  <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
+                  <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                 </button>
                 <button
+                  type="button"
                   onClick={handleNext}
-                  className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-black/60 hover:bg-[#C59B27] hover:text-[#0C2B1D] text-white backdrop-blur-md border border-white/30 items-center justify-center transition-all opacity-85 hover:opacity-100 hover:scale-110 shadow-lg z-20 cursor-pointer"
+                  className="flex absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-black/60 hover:bg-[#C59B27] hover:text-[#0C2B1D] text-white backdrop-blur-md border border-white/20 sm:border-white/30 items-center justify-center transition-all opacity-75 sm:opacity-85 hover:opacity-100 active:scale-90 hover:scale-110 shadow-lg z-20 cursor-pointer"
                   aria-label="Next Category Banner"
                 >
-                  <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
+                  <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                 </button>
               </>
             )}
 
-            {/* Slide Indicators and Progress */}
+            {/* Slide Indicators, Counter & Swipe Hint */}
             {safeBanners.length > 1 && (
-              <div className="absolute bottom-1.5 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-2 bg-black/70 backdrop-blur-md px-2 sm:px-3.5 py-0.5 sm:py-1.5 rounded-full border border-white/15 z-20">
+              <div className="absolute bottom-1.5 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-2 bg-black/75 backdrop-blur-md px-2 sm:px-3.5 py-0.5 sm:py-1.5 rounded-full border border-white/15 z-20 shadow-md">
                 {safeBanners.map((b, idx) => (
                   <button
                     key={b.id || idx}
-                    onClick={() => setCurrentIndex(idx)}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentIndex(idx);
+                    }}
                     className={`h-1.5 sm:h-2 rounded-full transition-all cursor-pointer ${
                       currentIndex === idx ? 'w-4 sm:w-6 bg-[#C59B27]' : 'w-1.5 sm:w-2 bg-white/40 hover:bg-white/70'
                     }`}
@@ -292,6 +427,9 @@ export default function SpotlightCarousel({
                 ))}
                 <span className="text-[8px] sm:text-[10px] font-mono text-[#FFD875] font-bold ml-0.5 sm:ml-1">
                   0{currentIndex + 1} / 0{safeBanners.length}
+                </span>
+                <span className="text-[7.5px] text-[#AECDBB] font-semibold hidden xs:inline sm:hidden ml-1">
+                  • Swipe ↔
                 </span>
               </div>
             )}
