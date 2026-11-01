@@ -251,23 +251,23 @@ export default function ProductModal({
                 </div>
               </div>
 
-              {/* Primary Call to Action Buttons - Exclusively WhatsApp */}
+              {/* Primary Call to Action Buttons matching vibrant theme */}
               <div className="space-y-2.5 pt-2">
                 <button
                   onClick={handleWhatsApp}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] active:bg-[#1da850] text-white font-extrabold text-sm sm:text-base shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
+                  className="w-full py-3 sm:py-3.5 px-4 rounded-xl bg-[#F5A623] hover:bg-[#E59715] active:bg-[#CC840E] text-white font-black text-sm sm:text-base shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
                 >
                   <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
-                  <span>Order on WhatsApp • ₹{lineTotal}</span>
+                  <span>Buy Now on WhatsApp • ₹{lineTotal.toFixed(2)}</span>
                 </button>
 
                 <button
                   onClick={handleAddToCart}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#FBF9F5] hover:bg-[#EAF3EE] text-[#133E2B] border border-[#133E2B]/20 hover:border-[#133E2B] font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2.5 sm:py-3 px-4 rounded-xl bg-[#52B82E] hover:bg-[#439E23] active:bg-[#38881C] text-white font-black text-xs sm:text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <ShoppingBag className="w-4 h-4 text-[#133E2B]" />
+                  <ShoppingBag className="w-4 h-4 text-white" />
                   <span>
-                    {addedNotice ? '✓ Added to WhatsApp Bag!' : 'Add to WhatsApp Bag (Order Multiple Varieties)'}
+                    {addedNotice ? '✓ Added to Cart!' : `Add to Cart (${quantity} Bag${quantity > 1 ? 's' : ''})`}
                   </span>
                 </button>
               </div>

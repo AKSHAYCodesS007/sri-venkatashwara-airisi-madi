@@ -530,30 +530,12 @@ export default function Home() {
         onWhatsAppOrder={handleGeneralWhatsAppOrder}
       />
 
-      {/* 2. Spotlight Offer Carousel (Positioned Directly Below Navbar on Home View) */}
-      {currentView === 'home' && (
-        <SpotlightCarousel
-          banners={offerBanners}
-          onSelectProduct={handleSelectProduct}
-          onSelectCategory={(catId) => {
-            setSelectedCategory(catId);
-            const el = document.getElementById('products-catalog');
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth' });
-            } else {
-              handleNavigate('products', { category: catId });
-            }
-          }}
-          onOpenBannerManager={() => setIsBannerManagerOpen(true)}
-        />
-      )}
-
       {/* Main View Router */}
       <main className="flex-1">
         {/* HOME VIEW */}
         {currentView === 'home' && (
           <>
-            {/* Hero Section */}
+            {/* Hero Section at the top directly under Navbar matching screenshot */}
             <HeroSection
               onNavigateToCatalog={() => {
                 const el = document.getElementById('products-catalog');
@@ -566,6 +548,40 @@ export default function Home() {
               onWhatsAppOrder={handleGeneralWhatsAppOrder}
               totalCartCount={totalCartCount}
             />
+
+            {/* Spotlight Offer Carousel */}
+            <SpotlightCarousel
+              banners={offerBanners}
+              onSelectProduct={handleSelectProduct}
+              onSelectCategory={(catId) => {
+                setSelectedCategory(catId);
+                const el = document.getElementById('products-catalog');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  handleNavigate('products', { category: catId });
+                }
+              }}
+              onOpenBannerManager={() => setIsBannerManagerOpen(true)}
+            />
+
+            {/* Direct Products Catalog on Home Page matching "Our Rice Products" */}
+            <div id="products-catalog" className="scroll-mt-20">
+              <CatalogView
+                products={products}
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onSelectProduct={handleSelectProduct}
+                onAddToCart={handleAddToCart}
+                onDirectWhatsApp={(prod, weight, qty) =>
+                  handleDirectWhatsAppProduct(prod, weight, qty || 1)
+                }
+                cartItemsCountMap={cartItemsCountMap}
+              />
+            </div>
 
             {/* Categories Showcase */}
             <CategoriesGrid
@@ -581,24 +597,6 @@ export default function Home() {
                 }
               }}
             />
-
-            {/* Direct Products Catalog on Home Page */}
-            <div id="products-catalog" className="scroll-mt-20">
-              <CatalogView
-                products={products}
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onSelectProduct={handleSelectProduct}
-                onAddToCart={handleAddToCart}
-                onDirectWhatsApp={(prod, weight) =>
-                  handleDirectWhatsAppProduct(prod, weight, 1)
-                }
-                cartItemsCountMap={cartItemsCountMap}
-              />
-            </div>
 
             {/* Customer Reviews Section */}
             <CustomerReviewsSection
@@ -619,8 +617,8 @@ export default function Home() {
             onSearchChange={setSearchQuery}
             onSelectProduct={handleSelectProduct}
             onAddToCart={handleAddToCart}
-            onDirectWhatsApp={(prod, weight) =>
-              handleDirectWhatsAppProduct(prod, weight, 1)
+            onDirectWhatsApp={(prod, weight, qty) =>
+              handleDirectWhatsAppProduct(prod, weight, qty || 1)
             }
             cartItemsCountMap={cartItemsCountMap}
           />
@@ -900,34 +898,30 @@ export default function Home() {
         }}
       />
 
-      {/* Persistent Floating Quick Actions (WhatsApp Order & Cart - Always visible while browsing) */}
-      <aside aria-label="Quick Order Actions" className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 pointer-events-auto">
+      {/* Persistent Floating Quick Actions (WhatsApp & Cart matching screenshot) */}
+      <aside aria-label="Quick Order Actions" className="fixed bottom-5 right-5 z-40 flex items-center gap-3 pointer-events-auto">
         {totalCartCount > 0 && (
           <button
             onClick={() => setIsCartOpen(true)}
-            className="bg-[#133E2B] hover:bg-[#1C523B] text-white px-3.5 sm:px-4 py-3 rounded-full shadow-2xl border-2 border-[#C59B27] flex items-center gap-2 text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
-            title="Open WhatsApp Order Bag"
+            className="bg-[#111827] hover:bg-black text-white px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full shadow-2xl border border-gray-300 flex items-center gap-2 text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
+            title="Open Shopping Cart"
           >
-            <ShoppingCart className="w-4 h-4 text-[#C59B27]" />
+            <ShoppingCart className="w-4 h-4 text-[#F5A623]" />
             <span>Bag ({totalCartCount})</span>
-            <span className="bg-[#C59B27] text-[#0C2B1D] text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
+            <span className="bg-[#52B82E] text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
               ₹{cartSubtotal.toLocaleString('en-IN')}
             </span>
           </button>
         )}
 
+        {/* Circular Floating WhatsApp Button matching screenshot */}
         <button
           onClick={handleGeneralWhatsAppOrder}
-          className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-4 py-3 rounded-full shadow-2xl border-2 border-white flex items-center gap-2 text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer group"
-          title="Order on WhatsApp / Chat with Mill Desk"
+          className="w-13 h-13 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer group"
+          title="Direct WhatsApp Order"
+          aria-label="Direct WhatsApp Order"
         >
-          <WhatsAppIcon className="w-5 h-5 text-white shrink-0 group-hover:rotate-12 transition-transform" />
-          <span className="hidden sm:inline font-bold">
-            {totalCartCount > 0 ? `WhatsApp Order (${totalCartCount})` : 'Order on WhatsApp'}
-          </span>
-          <span className="sm:hidden font-bold">
-            {totalCartCount > 0 ? `(${totalCartCount})` : 'WhatsApp'}
-          </span>
+          <WhatsAppIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-105 transition-transform" />
         </button>
       </aside>
     </div>
