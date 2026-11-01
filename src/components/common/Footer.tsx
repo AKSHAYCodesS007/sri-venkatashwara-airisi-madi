@@ -121,14 +121,7 @@ export default function Footer({ storeInfo, onNavigate }: FooterProps) {
                   All Rice Varieties
                 </button>
               </li>
-              <li>
-                <button
-                  onClick={() => onNavigate('track')}
-                  className="hover:text-white transition cursor-pointer"
-                >
-                  Track Order
-                </button>
-              </li>
+              
               <li>
                 <button
                   onClick={() => onNavigate('reviews')}

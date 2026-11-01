@@ -97,14 +97,7 @@ export default function Navbar({
                 Office: <strong className="text-white font-semibold">95000 14516</strong>
               </span>
             </a>
-            <span className="hidden md:inline text-white/30">|</span>
-            <button
-              onClick={() => handleNav('track')}
-              className="hidden md:flex items-center gap-1 text-[#E6E2D8] hover:text-[#C59B27] transition font-semibold cursor-pointer"
-            >
-              <Truck className="w-3 h-3 text-[#C59B27]" />
-              <span>Track Order</span>
-            </button>
+            
           </div>
         </div>
       </div>
@@ -172,17 +165,7 @@ export default function Navbar({
               <span>Products</span>
             </button>
 
-            <button
-              onClick={() => handleNav('track')}
-              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
-                currentView === 'track'
-                  ? 'bg-[#EAF3EE] text-[#133E2B] font-bold shadow-xs border border-[#133E2B]/15'
-                  : 'hover:bg-gray-100 hover:text-[#133E2B]'
-              }`}
-            >
-              <Truck className={`w-3.5 h-3.5 ${currentView === 'track' ? 'text-[#133E2B]' : 'text-[#7C8D83]'}`} />
-              <span>Track Order</span>
-            </button>
+            
 
             <button
               onClick={() => handleNav('reviews')}
@@ -335,17 +318,7 @@ export default function Navbar({
                 <span>Products</span>
               </button>
 
-              <button
-                onClick={() => handleNav('track')}
-                className={`p-2.5 rounded-lg flex items-center gap-2 border transition cursor-pointer ${
-                  currentView === 'track'
-                    ? 'bg-[#EAF3EE] border-[#133E2B] text-[#133E2B] font-bold'
-                    : 'bg-[#FBF9F5] border-[#E6E2D8] text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Truck className="w-4 h-4 text-[#133E2B]" />
-                <span>Track Order</span>
-              </button>
+              
 
               <button
                 onClick={() => handleNav('reviews')}

@@ -23,16 +23,14 @@ interface OrderConfirmationModalProps {
   whatsappUrl: string;
   storeInfo: StoreInfo;
   onClose: () => void;
-  onTrackOrder: (orderId: string) => void;
-}
+  }
 
 export default function OrderConfirmationModal({
   isOpen,
   order,
   whatsappUrl,
   storeInfo,
-  onClose,
-  onTrackOrder,
+  onClose ,
 }: OrderConfirmationModalProps) {
   const [copied, setCopied] = useState(false);
   const [openedWhatsApp, setOpenedWhatsApp] = useState(false);
@@ -53,11 +51,6 @@ export default function OrderConfirmationModal({
     if (whatsappUrl) {
       window.open(whatsappUrl, '_blank');
     }
-  };
-
-  const handleGoToTracking = () => {
-    onClose();
-    onTrackOrder(order.orderId);
   };
 
   const displayId = order.orderId.startsWith('#') ? order.orderId : `#${order.orderId}`;
@@ -187,7 +180,7 @@ export default function OrderConfirmationModal({
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 text-center">
               <span className="font-bold">✓ WhatsApp Chat Initiated!</span>
               <p className="text-[11px] text-blue-800 mt-0.5">
-                Order <span className="font-mono font-bold">{displayId}</span> has been saved. You can monitor live progress using the tracking button below.
+                Order <span className="font-mono font-bold">{displayId}</span> has been saved. Our mill team will review your order details on WhatsApp.
               </p>
             </div>
           )}
@@ -209,22 +202,13 @@ export default function OrderConfirmationModal({
           </button>
 
           {/* Secondary Actions */}
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              type="button"
-              onClick={handleGoToTracking}
-              className="flex-1 py-2.5 px-3 rounded-xl bg-white hover:bg-[#EAF3EE] text-[#133E2B] border border-[#133E2B]/20 hover:border-[#133E2B] font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Truck className="w-3.5 h-3.5 text-[#133E2B]" />
-              <span>Track Order Live</span>
-            </button>
-
+          <div className="pt-1">
             <button
               type="button"
               onClick={onClose}
-              className="py-2.5 px-4 rounded-xl bg-gray-200/70 hover:bg-gray-200 text-gray-700 font-bold text-xs transition cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs transition cursor-pointer"
             >
-              Close
+              Close &amp; Continue Shopping
             </button>
           </div>
         </div>

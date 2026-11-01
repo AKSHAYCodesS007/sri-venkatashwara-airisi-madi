@@ -11,8 +11,6 @@ import ProductCard from '@/components/catalog/ProductCard';
 import ProductModal from '@/components/catalog/ProductModal';
 import CartDrawer from '@/components/cart/CartDrawer';
 import dynamic from 'next/dynamic';
-import OrderTrackingView from '@/components/tracking/OrderTrackingView';
-
 // Code-splitting & hiding admin chunk from normal customer bundles
 const AdminDashboard = dynamic(() => import('@/components/admin/AdminDashboard'), {
   ssr: false,
@@ -496,11 +494,7 @@ export default function Home() {
     if (extra?.category) {
       setSelectedCategory(extra.category);
     }
-    if (extra?.trackingId) {
-      setActiveTrackingId(extra.trackingId);
-    } else if (view === 'track') {
-      setActiveTrackingId(undefined);
-    }
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -605,15 +599,7 @@ export default function Home() {
           />
         )}
 
-        {/* ORDER TRACKING VIEW */}
-        {currentView === 'track' && (
-          <OrderTrackingView
-            orders={orders}
-            activeTrackingId={activeTrackingId}
-            storeInfo={storeInfo}
-            onWriteReview={handleOpenWriteReview}
-          />
-        )}
+        
 
         {/* CUSTOMER REVIEWS VIEW */}
         {currentView === 'reviews' && (
@@ -873,11 +859,7 @@ export default function Home() {
         whatsappUrl={confirmedWhatsAppUrl}
         storeInfo={storeInfo}
         onClose={() => setIsOrderConfirmationOpen(false)}
-        onTrackOrder={(orderId) => {
-          setActiveTrackingId(orderId);
-          setCurrentView('track');
-        }}
-      />
+        />
 
       {/* Persistent Floating Quick Actions (WhatsApp & Cart matching screenshot) */}
       <aside aria-label="Quick Order Actions" className="fixed bottom-5 right-5 z-40 flex items-center gap-3 pointer-events-auto">
