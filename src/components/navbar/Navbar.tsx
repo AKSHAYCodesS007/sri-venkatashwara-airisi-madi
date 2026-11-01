@@ -4,16 +4,20 @@ import React, { useState } from 'react';
 import {
   Home,
   ShoppingBag,
+  Sparkles,
+  Truck,
   Info,
+  ShoppingCart,
   Search,
   Menu,
   X,
   Phone,
+  Clock,
   ShieldCheck,
   Star
 } from 'lucide-react';
 import { StoreInfo } from '@/types';
-import { WhatsAppIcon } from '@/components/common/Icons';
+import { WhatsAppIcon, GrainLogoIcon } from '@/components/common/Icons';
 
 interface NavbarProps {
   currentView: string;
@@ -56,128 +60,140 @@ export default function Navbar({
 
   return (
     <>
-      {/* Top Bar / Mill Notice with Gold & Light Green Theme */}
-      <div className="bg-[#FAF5E9] text-[#222E26] text-xs py-1.5 px-3 sm:px-6 border-b border-[#EADFC7] w-full max-w-full overflow-hidden">
-        <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <span className="bg-[#52B82E] text-white px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black tracking-wider uppercase inline-flex items-center gap-1 shadow-2xs shrink-0">
+      {/* Top Bar / Mill Notice */}
+      <div className="bg-[#0C2B1D] text-[#E6E2D8] text-xs py-1.5 px-2.5 sm:px-4 border-b border-[#1C523B] w-full max-w-full overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <span className="bg-[#C59B27] text-[#0C2B1D] px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1 shadow-xs shrink-0">
               <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-              <span>Pan-India Wholesale</span>
+              <span className="hidden xs:inline">Wholesale Mandy &amp; Mill</span>
+              <span className="xs:hidden">Mill Mandy</span>
             </span>
-            <span className="text-[10px] sm:text-xs text-[#8C6914] font-bold tracking-wide truncate">
+            <span className="text-[10px] sm:text-xs text-[#FFD875] font-semibold tracking-wide truncate">
               || {storeInfo.invocation || "ஸ்ரீ குழந்தை அம்மன் துணை"} ||
             </span>
-            <span className="hidden lg:inline text-[11px] text-[#55695E] truncate">
+            <span className="hidden lg:inline text-[11px] text-[#D5E6DC] truncate">
               • 26kg Direct Mill Sacks • Pan-India Doorstep Delivery Across All Over India
             </span>
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 text-[10px] sm:text-[11px] text-[#475A4F] shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] text-[#AECDBB] shrink-0">
             <a
               href={`tel:${storeInfo.whatsappNumber}`}
-              className="flex items-center gap-1 hover:text-[#52B82E] transition font-bold"
+              className="flex items-center gap-1 hover:text-white transition"
             >
-              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#52B82E]" />
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#C59B27]" />
               <span className="whitespace-nowrap">
-                <span className="hidden xs:inline">Mandi: </span>99621 19810
+                <span className="hidden xs:inline">Mandi: </span><strong className="text-white font-semibold">99621 19810</strong>
               </span>
             </a>
-            <span className="hidden sm:inline text-gray-300">|</span>
+            <span className="hidden sm:inline text-white/30">|</span>
             <a
               href="tel:9500014516"
-              className="hidden sm:flex items-center gap-1 hover:text-[#52B82E] transition font-bold"
+              className="hidden sm:flex items-center gap-1 hover:text-white transition"
             >
               <Phone className="w-3 h-3 text-[#C59B27]" />
               <span>
-                Office: 95000 14516
+                Office: <strong className="text-white font-semibold">95000 14516</strong>
               </span>
             </a>
+            
           </div>
         </div>
       </div>
 
-      {/* Main Sticky Navbar matching warm cream, light green & gold aesthetic */}
-      <header className="sticky top-0 z-40 bg-[#FAF5E9]/95 backdrop-blur-md border-b border-[#EADFC7] shadow-xs transition-all w-full max-w-full overflow-hidden">
-        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
+      {/* Main Sticky Navbar */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E6E2D8] shadow-xs transition-all w-full max-w-full overflow-hidden">
+        <div className="w-full max-w-[1440px] mx-auto px-2 sm:px-4 lg:px-6 h-16 sm:h-20 flex items-center justify-between gap-1.5 sm:gap-3">
           
           {/* Logo & Brand Title */}
           <div
             onClick={() => handleNav('home')}
-            className="flex items-center gap-2 sm:gap-3 cursor-pointer group select-none min-w-0"
+            className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer group select-none min-w-0 flex-1"
           >
-            <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white border border-[#EADFC7] p-1 flex items-center justify-center shadow-xs group-hover:scale-105 transition-all overflow-hidden shrink-0">
+            <div className="relative w-8 h-8 sm:w-11 sm:h-11 rounded-lg sm:rounded-xl bg-[#FBF9F5] border border-[#C59B27]/70 p-0.5 sm:p-1 flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:border-[#C59B27] transition-all overflow-hidden shrink-0">
               <img
                 src={storeInfo.logo || "/images/logo.png"}
                 alt={storeInfo.name}
                 className="w-full h-full object-contain"
               />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="font-serif text-xs sm:text-base lg:text-lg font-black tracking-tight text-[#111827] leading-tight truncate block">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1">
+                <span className="font-serif text-[11px] xs:text-xs sm:text-base lg:text-lg font-black tracking-tight text-[#133E2B] leading-tight truncate block">
                   {storeInfo.name}
                 </span>
+                <span className="hidden 2xl:inline-block text-[9px] bg-[#FEF9EB] text-[#A27B16] border border-[#E6CE8A] px-1 py-0.2 rounded font-bold uppercase tracking-wider shrink-0">
+                  Estd. {storeInfo.established}
+                </span>
               </div>
-              <p className="text-[9px] sm:text-[11px] text-[#52B82E] font-bold tracking-wide flex items-center gap-1 leading-tight truncate">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#52B82E] shrink-0" />
-                <span className="truncate">{storeInfo.tamilName || "ஸ்ரீ வெங்கடேஸ்வரா அரிசி மண்டி"}</span>
-              </p>
+              <div className="flex items-center gap-1">
+                <p className="text-[9px] sm:text-[11px] text-[#133E2B] font-bold tracking-wide flex items-center gap-1 leading-tight truncate">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C59B27] shrink-0"></span>
+                  <span className="truncate">{storeInfo.tamilName || "ஸ்ரீ வெங்கடேஸ்வரா அரிசி மண்டி"}</span>
+                </p>
+                <span className="text-[10px] text-[#A27B16] font-bold uppercase tracking-wider hidden 2xl:inline shrink-0">
+                  • Rice Wholesale
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center space-x-1 text-xs font-bold text-[#222E26] shrink min-w-0">
+          {/* Desktop Navigation Links (Offers removed from Navbar as requested) */}
+          <nav className="hidden xl:flex items-center space-x-1 text-xs font-bold text-[#19241F] shrink min-w-0">
             <button
               onClick={() => handleNav('home')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 currentView === 'home'
-                  ? 'bg-white text-[#111827] font-black shadow-xs border border-[#EADFC7]'
-                  : 'hover:bg-white/60 hover:text-[#111827]'
+                  ? 'bg-[#EAF3EE] text-[#133E2B] font-bold shadow-xs border border-[#133E2B]/15'
+                  : 'hover:bg-gray-100 hover:text-[#133E2B]'
               }`}
             >
-              <Home className={`w-3.5 h-3.5 ${currentView === 'home' ? 'text-[#52B82E]' : 'text-gray-500'}`} />
+              <Home className={`w-3.5 h-3.5 ${currentView === 'home' ? 'text-[#133E2B]' : 'text-[#7C8D83]'}`} />
               <span>Home</span>
             </button>
 
             <button
               onClick={() => handleNav('products')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 currentView === 'products'
-                  ? 'bg-white text-[#111827] font-black shadow-xs border border-[#EADFC7]'
-                  : 'hover:bg-white/60 hover:text-[#111827]'
+                  ? 'bg-[#EAF3EE] text-[#133E2B] font-bold shadow-xs border border-[#133E2B]/15'
+                  : 'hover:bg-gray-100 hover:text-[#133E2B]'
               }`}
             >
-              <ShoppingBag className={`w-3.5 h-3.5 ${currentView === 'products' ? 'text-[#52B82E]' : 'text-gray-500'}`} />
-              <span>Our Rice Products</span>
+              <ShoppingBag className={`w-3.5 h-3.5 ${currentView === 'products' ? 'text-[#133E2B]' : 'text-[#7C8D83]'}`} />
+              <span>Products</span>
             </button>
+
+            
 
             <button
               onClick={() => handleNav('reviews')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 currentView === 'reviews'
-                  ? 'bg-white text-[#111827] font-black shadow-xs border border-[#EADFC7]'
-                  : 'hover:bg-white/60 hover:text-[#111827]'
+                  ? 'bg-[#EAF3EE] text-[#133E2B] font-bold shadow-xs border border-[#133E2B]/15'
+                  : 'hover:bg-gray-100 hover:text-[#133E2B]'
               }`}
             >
-              <Star className={`w-3.5 h-3.5 ${currentView === 'reviews' ? 'text-[#C59B27] fill-[#C59B27]' : 'text-gray-500'}`} />
+              <Star className={`w-3.5 h-3.5 ${currentView === 'reviews' ? 'text-[#C59B27] fill-[#C59B27]' : 'text-[#7C8D83]'}`} />
               <span>Reviews</span>
             </button>
 
             <button
               onClick={() => handleNav('about')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+              className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 currentView === 'about'
-                  ? 'bg-white text-[#111827] font-black shadow-xs border border-[#EADFC7]'
-                  : 'hover:bg-white/60 hover:text-[#111827]'
+                  ? 'bg-[#EAF3EE] text-[#133E2B] font-bold shadow-xs border border-[#133E2B]/15'
+                  : 'hover:bg-gray-100 hover:text-[#133E2B]'
               }`}
             >
-              <Info className={`w-3.5 h-3.5 ${currentView === 'about' ? 'text-[#52B82E]' : 'text-gray-500'}`} />
-              <span>About Mandi</span>
+              <Info className={`w-3.5 h-3.5 ${currentView === 'about' ? 'text-[#133E2B]' : 'text-[#7C8D83]'}`} />
+              <span>About Us</span>
             </button>
           </nav>
 
-          {/* Right Action Controls: Search, WhatsApp & Shopping Bag Pill matching screenshot `🛍️ 0` */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Right Utility Actions - WhatsApp & Cart ALWAYS Visible */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Quick Search */}
             <div className="relative hidden md:block">
               <input
@@ -185,44 +201,58 @@ export default function Navbar({
                 placeholder="Search rice..."
                 value={searchQuery}
                 onChange={(e) => handleSearchInput(e.target.value)}
-                className="w-28 lg:w-36 xl:w-44 text-xs pl-7 pr-6 py-1.5 rounded-full border border-[#EADFC7] bg-white focus:outline-none focus:border-[#52B82E] transition-all text-[#19241F]"
+                className="w-28 lg:w-36 xl:w-44 text-xs pl-7 pr-6 py-2 rounded-full border border-[#E6E2D8] bg-[#FBF9F5] focus:outline-none focus:border-[#133E2B] focus:bg-white transition-all text-[#19241F]"
               />
-              <Search className="absolute left-2.5 top-2 text-gray-400 w-3 h-3" />
+              <Search className="absolute left-2.5 top-2.5 text-[#7C8D83] w-3 h-3" />
               {searchQuery && (
                 <button
                   onClick={() => onSearchChange('')}
-                  className="absolute right-2 top-1.5 text-gray-400 text-xs hover:text-black font-bold cursor-pointer"
+                  className="absolute right-2 top-2 text-[#7C8D83] text-xs hover:text-black font-bold cursor-pointer"
                 >
                   ✕
                 </button>
               )}
             </div>
 
-            {/* Direct WhatsApp Pill */}
+            {/* WhatsApp Quick Order Button - Always Visible */}
             <button
               onClick={onWhatsAppOrder}
-              className="inline-flex items-center gap-1 sm:gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer active:scale-95"
-              title="Order directly on WhatsApp"
+              className="shrink-0 inline-flex items-center gap-1 sm:gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold shadow-xs hover:shadow transition-all duration-150 cursor-pointer active:scale-95"
+              title={
+                totalCartCount > 0
+                  ? `Take ${totalCartCount} selected item(s) to WhatsApp`
+                  : 'Order directly on WhatsApp'
+              }
             >
               <WhatsAppIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" />
-              <span className="hidden sm:inline">WhatsApp</span>
+              <span className="hidden sm:inline">
+                {totalCartCount > 0 ? `WhatsApp (${totalCartCount})` : 'WhatsApp Order'}
+              </span>
+              <span className="sm:hidden text-[11px] font-bold">
+                {totalCartCount > 0 ? `WA (${totalCartCount})` : 'WA'}
+              </span>
             </button>
 
-            {/* Shopping Bag Icon with Count Pill matching screenshot `🛍️ 0` */}
+            {/* WhatsApp Order Bag Button - Always Visible */}
             <button
               onClick={onOpenCart}
-              className="relative px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white hover:bg-gray-50 border border-[#EADFC7] text-[#111827] flex items-center gap-1.5 sm:gap-2 text-xs font-black transition-all shadow-xs cursor-pointer active:scale-95 group"
-              title="View Cart"
-              aria-label="View Shopping Cart"
+              className="shrink-0 relative px-2 py-1.5 sm:px-3.5 sm:py-2 rounded-lg sm:rounded-xl bg-[#133E2B] hover:bg-[#1C523B] text-white flex items-center gap-1 sm:gap-2 text-xs font-bold transition shadow-xs cursor-pointer active:scale-95"
+              title="View WhatsApp Order Bag"
+              aria-label="View Order Bag"
             >
-              <span className="text-sm sm:text-base leading-none">🛍️</span>
-              <span className="font-black text-xs sm:text-sm text-[#111827]">{totalCartCount}</span>
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] shrink-0" />
+              <span className="hidden sm:inline">Bag</span>
+              {totalCartCount > 0 && (
+                <span className="bg-[#C59B27] text-[#0C2B1D] text-[9px] sm:text-[11px] font-extrabold px-1.5 py-0.2 rounded-full min-w-[16px] text-center shadow-xs">
+                  {totalCartCount}
+                </span>
+              )}
             </button>
 
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-1.5 sm:p-2 rounded-lg border border-[#EADFC7] bg-white text-[#19241F] hover:bg-gray-50 transition cursor-pointer shrink-0"
+              className="xl:hidden p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-[#E6E2D8] text-[#19241F] hover:bg-gray-100 transition cursor-pointer shrink-0"
               aria-label="Toggle Navigation"
             >
               {mobileMenuOpen ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Menu className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -232,29 +262,47 @@ export default function Navbar({
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="xl:hidden bg-[#FAF5E9] border-b border-[#EADFC7] px-4 pt-3 pb-6 space-y-3 shadow-xl animate-fade-in">
+          <div className="xl:hidden bg-white border-b border-[#E6E2D8] px-4 pt-3 pb-6 space-y-3 shadow-xl animate-fade-in">
+            {/* Mobile Quick Action Buttons */}
+            <div className="grid grid-cols-2 gap-2 pb-1">
+              <button
+                onClick={() => { onWhatsAppOrder(); setMobileMenuOpen(false); }}
+                className="bg-[#25D366] text-white py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+              >
+                <WhatsAppIcon className="w-4 h-4 text-white" />
+                <span>WhatsApp {totalCartCount > 0 ? `(${totalCartCount})` : 'Order'}</span>
+              </button>
+              <button
+                onClick={() => { onOpenCart(); setMobileMenuOpen(false); }}
+                className="bg-[#133E2B] text-white py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+              >
+                <ShoppingCart className="w-4 h-4 text-[#C59B27]" />
+                <span>Cart {totalCartCount > 0 ? `(${totalCartCount})` : ''}</span>
+              </button>
+            </div>
+
             {/* Mobile Search */}
             <div className="relative mb-2">
               <input
                 type="text"
-                placeholder="Search AKS Bullet, Ponni, Idly..."
+                placeholder="Search 1121, Sona Masuri, Ponni..."
                 value={searchQuery}
                 onChange={(e) => handleSearchInput(e.target.value)}
-                className="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-[#EADFC7] bg-white text-[#19241F] focus:outline-none focus:border-[#52B82E]"
+                className="w-full text-xs pl-9 pr-3 py-2.5 rounded-lg border border-[#E6E2D8] bg-[#FBF9F5] text-[#19241F] focus:outline-none focus:border-[#133E2B]"
               />
-              <Search className="absolute left-3 top-3 text-gray-400 w-3.5 h-3.5" />
+              <Search className="absolute left-3 top-3 text-[#7C8D83] w-3.5 h-3.5" />
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+            <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
               <button
                 onClick={() => handleNav('home')}
                 className={`p-2.5 rounded-lg flex items-center gap-2 border transition cursor-pointer ${
                   currentView === 'home'
-                    ? 'bg-white border-[#52B82E] text-[#111827]'
-                    : 'bg-white/70 border-[#EADFC7] text-gray-700 hover:bg-white'
+                    ? 'bg-[#EAF3EE] border-[#133E2B] text-[#133E2B] font-bold'
+                    : 'bg-[#FBF9F5] border-[#E6E2D8] text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <Home className="w-4 h-4 text-[#52B82E]" />
+                <Home className="w-4 h-4 text-[#133E2B]" />
                 <span>Home</span>
               </button>
 
@@ -262,35 +310,37 @@ export default function Navbar({
                 onClick={() => handleNav('products')}
                 className={`p-2.5 rounded-lg flex items-center gap-2 border transition cursor-pointer ${
                   currentView === 'products'
-                    ? 'bg-white border-[#52B82E] text-[#111827]'
-                    : 'bg-white/70 border-[#EADFC7] text-gray-700 hover:bg-white'
+                    ? 'bg-[#EAF3EE] border-[#133E2B] text-[#133E2B] font-bold'
+                    : 'bg-[#FBF9F5] border-[#E6E2D8] text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <ShoppingBag className="w-4 h-4 text-[#52B82E]" />
+                <ShoppingBag className="w-4 h-4 text-[#133E2B]" />
                 <span>Products</span>
               </button>
+
+              
 
               <button
                 onClick={() => handleNav('reviews')}
                 className={`p-2.5 rounded-lg flex items-center gap-2 border transition cursor-pointer ${
                   currentView === 'reviews'
-                    ? 'bg-white border-[#52B82E] text-[#111827]'
-                    : 'bg-white/70 border-[#EADFC7] text-gray-700 hover:bg-white'
+                    ? 'bg-[#EAF3EE] border-[#133E2B] text-[#133E2B] font-bold'
+                    : 'bg-[#FBF9F5] border-[#E6E2D8] text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 <Star className="w-4 h-4 text-[#C59B27]" />
-                <span>Reviews</span>
+                <span>Customer Reviews</span>
               </button>
 
               <button
                 onClick={() => handleNav('about')}
                 className={`p-2.5 rounded-lg flex items-center gap-2 border transition cursor-pointer ${
                   currentView === 'about'
-                    ? 'bg-white border-[#52B82E] text-[#111827]'
-                    : 'bg-white/70 border-[#EADFC7] text-gray-700 hover:bg-white'
+                    ? 'bg-[#EAF3EE] border-[#133E2B] text-[#133E2B] font-bold'
+                    : 'bg-[#FBF9F5] border-[#E6E2D8] text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                <Info className="w-4 h-4 text-[#52B82E]" />
+                <Info className="w-4 h-4 text-[#133E2B]" />
                 <span>About Us</span>
               </button>
             </div>

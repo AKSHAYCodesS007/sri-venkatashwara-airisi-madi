@@ -540,7 +540,22 @@ export default function Home() {
               totalCartCount={totalCartCount}
             />
 
-            {/* Direct Products Catalog on Home Page matching reference */}
+            {/* Categories Showcase */}
+            <CategoriesGrid
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={(catId) => {
+                setSelectedCategory(catId);
+                const el = document.getElementById('products-catalog');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  handleNavigate('products', { category: catId });
+                }
+              }}
+            />
+
+            {/* Direct Products Catalog on Home Page */}
             <div id="products-catalog" className="scroll-mt-20">
               <CatalogView
                 products={products}
