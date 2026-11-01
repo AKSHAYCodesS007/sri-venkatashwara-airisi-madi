@@ -353,9 +353,6 @@ export default function Home() {
     }
     text += `\n*ITEMS ORDERED:*\n`;
     text += `1. *${product.name}* (${weight})\n   Qty: ${quantity} bag(s) @ ₹${weightObj.price} = ₹${itemTotal}\n`;
-    text += `\nSubtotal: ₹${itemTotal}`;
-    text += `\nPlatform Fee: ₹0 (FREE)`;
-    text += `\nDelivery Fee (Chennai): ₹0 (FREE Doorstep Delivery)`;
     text += `\n*TOTAL PAYABLE (COD / UPI): ₹${finalTotal}*`;
     text += `\n\n_Vanakkam! Please confirm dispatch schedule to Chennai doorstep. Payment via Cash/UPI on arrival._`;
 
@@ -549,22 +546,6 @@ export default function Home() {
               totalCartCount={totalCartCount}
             />
 
-            {/* Spotlight Offer Carousel */}
-            <SpotlightCarousel
-              banners={offerBanners}
-              onSelectProduct={handleSelectProduct}
-              onSelectCategory={(catId) => {
-                setSelectedCategory(catId);
-                const el = document.getElementById('products-catalog');
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                  handleNavigate('products', { category: catId });
-                }
-              }}
-              onOpenBannerManager={() => setIsBannerManagerOpen(true)}
-            />
-
             {/* Direct Products Catalog on Home Page matching "Our Rice Products" */}
             <div id="products-catalog" className="scroll-mt-20">
               <CatalogView
@@ -582,21 +563,6 @@ export default function Home() {
                 cartItemsCountMap={cartItemsCountMap}
               />
             </div>
-
-            {/* Categories Showcase */}
-            <CategoriesGrid
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={(catId) => {
-                setSelectedCategory(catId);
-                const el = document.getElementById('products-catalog');
-                if (el) {
-                  el.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                  handleNavigate('products', { category: catId });
-                }
-              }}
-            />
 
             {/* Customer Reviews Section */}
             <CustomerReviewsSection

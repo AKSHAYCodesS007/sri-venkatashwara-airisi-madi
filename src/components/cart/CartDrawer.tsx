@@ -10,7 +10,6 @@ import {
   Trash2,
   Sparkles,
   ShieldCheck,
-  Tag,
   CheckCircle2,
   Truck,
   MapPin,
@@ -46,9 +45,6 @@ export default function CartDrawer({
     return /^600\d{3}$/.test(cleaned);
   };
 
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
-  const [couponError, setCouponError] = useState('');
   const [showAddressFields, setShowAddressFields] = useState(false);
 
   // Guest customer & delivery details (no login or account needed; remembered on device)
@@ -120,36 +116,7 @@ export default function CartDrawer({
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   const originalSubtotal = cartItems.reduce((acc, item) => acc + item.originalPrice * item.quantity, 0);
   const itemSavings = originalSubtotal - subtotal;
-
-  const couponDiscount = appliedCoupon ? appliedCoupon.discount : 0;
-  const platformFee = 0; // ₹0 FREE Platform Fee
-  const codFee = 0; // ₹0 FREE COD
-  const deliveryFee = 0; // ₹0 FREE Doorstep Delivery across Chennai
-
-  const finalTotal = Math.max(0, subtotal - couponDiscount);
-  const freeShippingDelta = 0;
-
-  // Apply Coupon Logic
-  const handleApplyCoupon = (e: React.FormEvent) => {
-    e.preventDefault();
-    setCouponError('');
-    const code = couponCode.trim().toUpperCase();
-
-    if (code === 'MILL50') {
-      if (subtotal < 300) {
-        setCouponError('Minimum order of ₹300 required for MILL50');
-        return;
-      }
-      setAppliedCoupon({ code: 'MILL50', discount: 50 });
-      setCouponCode('');
-    } else if (code === 'WELCOME10') {
-      const disc = Math.round(subtotal * 0.1);
-      setAppliedCoupon({ code: 'WELCOME10', discount: disc });
-      setCouponCode('');
-    } else {
-      setCouponError('Invalid coupon. Try "MILL50" or "WELCOME10"');
-    }
-  };
+  const finalTotal = subtotal;
 
   // Exclusive WhatsApp Order Desk Checkout
   const handleWhatsAppCheckout = async () => {
@@ -162,32 +129,52 @@ export default function CartDrawer({
       return;
     }
 
-    saveGuestDeliveryInfo();
     setIsSubmitting(true);
+    saveGuestDeliveryInfo();
+
+    const formattedAddress = deliveryAddress.trim()
+      ? `${deliveryAddress.trim()}${deliveryArea.trim() ? `, ${deliveryArea.trim()}` : ''}, Chennai - ${deliveryPincode.trim() || '600xxx'}${customerName.trim() ? ` (${customerName.trim()}, ${customerPhone.trim()})` : ''}`
+      : 'Doorstep Cash/UPI on Delivery (Chennai City & Suburbs)';
+
+    const orderPayload: Partial<Order> = {
+      items: cartItems.map((item) => ({
+        name: item.name,
+        weight: item.weight,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      total: finalTotal,
+      deliveryAddress: formattedAddress,
+      paymentMethod: 'WhatsApp Order (Cash / UPI on Delivery)',
+    };
 
     let createdOrder: Order | null = null;
     try {
-      const orderPayload: Partial<Order> = {
-        items: cartItems.map((item) => ({
-          name: item.name,
-          weight: item.weight,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        total: finalTotal,
-        deliveryAddress: deliveryAddress.trim()
-          ? `${deliveryAddress.trim()}${deliveryArea.trim() ? `, ${deliveryArea.trim()}` : ''}, Chennai - ${deliveryPincode.trim() || '600xxx'}${customerName.trim() ? ` (${customerName.trim()}, ${customerPhone.trim()})` : ''}`
-          : 'WhatsApp Order Desk (Doorstep Cash/UPI in Chennai)',
-        paymentMethod: 'WhatsApp Order (Cash / UPI on Delivery)',
-      };
-
       createdOrder = await onCreateOrderService(orderPayload);
-    } catch (err) {
-      console.warn('Could not record WhatsApp order to DB:', err);
+    } catch (e) {
+      console.warn('Local offline order fallback:', e);
+      createdOrder = {
+        orderId: 'RS' + Math.floor(10000 + Math.random() * 90000),
+        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        items: orderPayload.items || [],
+        total: finalTotal,
+        status: 'Order Placed',
+        currentStep: 1,
+        deliveryAddress: formattedAddress,
+        paymentMethod: 'WhatsApp Order (Cash / UPI on Delivery)',
+        trackingUpdates: [
+          {
+            status: 'Order Registered & Verified',
+            location: 'Chiikkarayapuram Mandi Hub, Chennai',
+            time: 'Just now',
+          },
+        ],
+      };
     } finally {
       setIsSubmitting(false);
     }
 
+    // Build Clean Direct WhatsApp Message
     let text = `🌾 *NEW RICE ORDER — ${storeInfo.name.toUpperCase()}*\n`;
     text += `📍 *Service Area: Exclusively Chennai City & Suburbs*\n`;
     if (createdOrder?.orderId) {
@@ -205,13 +192,6 @@ export default function CartDrawer({
       text += `${index + 1}. *${item.name}* (${item.weight})\n   Qty: ${item.quantity} bag(s) @ ₹${item.price} = ₹${item.price * item.quantity}\n`;
     });
 
-    text += `\nSubtotal: ₹${subtotal}`;
-    if (appliedCoupon) {
-      text += `\nCoupon (${appliedCoupon.code}): -₹${appliedCoupon.discount}`;
-    }
-    text += `\nPlatform Fee: ₹0 (FREE)`;
-    text += `\nDelivery Fee (Chennai): ₹0 (FREE Doorstep Delivery)`;
-    text += `\nCOD Fee: ₹0 (FREE)`;
     text += `\n*TOTAL PAYABLE (COD / UPI): ₹${finalTotal}*`;
     text += `\n\n_Vanakkam! Please confirm dispatch schedule to Chennai doorstep. Payment via Cash/UPI on arrival._`;
 
@@ -237,17 +217,13 @@ export default function CartDrawer({
         <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col text-[#19241F]">
           
           {/* Header */}
-          <div className="bg-[#0C2B1D] text-white px-6 py-4 flex items-center justify-between border-b border-[#1C523B]">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#C59B27] text-[#0C2B1D] flex items-center justify-center font-bold">
-                <ShoppingBag className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="font-serif text-base font-bold text-white">Your WhatsApp Order Bag</h3>
-                <span className="text-[11px] text-[#AECDBB]">
-                  {cartItems.reduce((acc, item) => acc + item.quantity, 0)} bag(s) selected for WhatsApp
-                </span>
-              </div>
+          <div className="bg-[#111827] text-white px-6 py-4 flex items-center justify-between border-b border-gray-800">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="w-5 h-5 text-[#52B82E]" />
+              <h3 className="font-serif font-bold text-base">Shopping Bag</h3>
+              <span className="text-xs bg-[#52B82E] text-white px-2 py-0.5 rounded-full font-bold">
+                {cartItems.reduce((acc, i) => acc + i.quantity, 0)}
+              </span>
             </div>
             <button
               onClick={onClose}
@@ -258,25 +234,15 @@ export default function CartDrawer({
           </div>
 
           {/* Exclusive Chennai Delivery Notice */}
-          <div className="bg-[#EAF3EE] border-b border-[#133E2B]/15 px-6 py-2 flex items-center justify-between text-xs text-[#133E2B]">
+          <div className="bg-[#FAF5E9] border-b border-[#EADFC7] px-6 py-2.5 flex items-center justify-between text-xs text-[#222E26]">
             <div className="flex items-center gap-1.5 font-bold text-[11px]">
-              <MapPin className="w-3.5 h-3.5 text-[#C59B27] flex-shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[#52B82E] flex-shrink-0" />
               <span>Doorstep Delivery: <strong>Exclusively Chennai Only</strong></span>
             </div>
-            <span className="text-[10px] bg-[#133E2B] text-white px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">
+            <span className="text-[10px] bg-[#111827] text-white px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">
               PIN 600xxx
             </span>
           </div>
-
-          {/* Free Shipping & ₹0 Platform Fee Banner */}
-          {cartItems.length > 0 && (
-            <div className="bg-[#EAF3EE] border-b border-emerald-200 px-6 py-2 text-xs text-emerald-800">
-              <div className="flex items-center gap-2 font-bold text-[11px]">
-                <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>100% FREE Chennai Doorstep Delivery &amp; ₹0 Platform Fee Unlocked!</span>
-              </div>
-            </div>
-          )}
 
           {/* Cart Items List */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -284,20 +250,20 @@ export default function CartDrawer({
               cartItems.map((item) => (
                 <div
                   key={item.cartItemId}
-                  className="bg-[#FBF9F5] border border-[#E6E2D8] rounded-xl p-3 flex gap-3 items-center"
+                  className="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 items-center shadow-2xs"
                 >
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-16 h-16 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+                    className="w-16 h-16 object-contain rounded-lg border border-gray-100 flex-shrink-0 p-1"
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-gray-900 truncate">{item.name}</h4>
-                    <span className="text-[11px] font-semibold text-[#133E2B] bg-[#EAF3EE] px-1.5 py-0.5 rounded inline-block mt-0.5">
+                    <h4 className="text-xs font-bold text-gray-900 truncate uppercase">{item.name}</h4>
+                    <span className="text-[11px] font-semibold text-[#111827] bg-gray-100 px-1.5 py-0.5 rounded inline-block mt-0.5">
                       Pack: {item.weight}
                     </span>
                     <div className="flex items-baseline gap-1.5 mt-1">
-                      <span className="text-xs font-bold text-gray-900">₹{item.price}</span>
+                      <span className="text-xs font-bold text-[#F39C12]">₹{item.price}</span>
                       <span className="text-[10px] text-gray-400 line-through">
                         ₹{item.originalPrice}
                       </span>
@@ -308,43 +274,40 @@ export default function CartDrawer({
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
                     <button
                       onClick={() => onRemoveItem(item.cartItemId)}
-                      className="text-gray-400 hover:text-red-600 transition cursor-pointer"
-                      title="Remove"
+                      className="text-gray-400 hover:text-red-600 transition p-1 cursor-pointer"
+                      title="Remove item"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                    <div className="flex items-center gap-1.5 bg-white border border-gray-300 rounded-lg p-0.5">
+                    <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5 bg-gray-50">
                       <button
                         onClick={() => onUpdateQuantity(item.cartItemId, item.quantity - 1)}
-                        className="w-5 h-5 rounded flex items-center justify-center hover:bg-gray-100 text-gray-700 cursor-pointer"
+                        className="w-5 h-5 flex items-center justify-center font-bold text-gray-600 hover:text-black cursor-pointer"
                       >
-                        <Minus className="w-3 h-3" />
+                        -
                       </button>
-                      <span className="text-xs font-bold px-1">{item.quantity}</span>
+                      <span className="text-xs font-bold px-1 min-w-[16px] text-center">
+                        {item.quantity}
+                      </span>
                       <button
                         onClick={() => onUpdateQuantity(item.cartItemId, item.quantity + 1)}
-                        className="w-5 h-5 rounded flex items-center justify-center hover:bg-gray-100 text-gray-700 cursor-pointer"
+                        className="w-5 h-5 flex items-center justify-center font-bold text-gray-600 hover:text-black cursor-pointer"
                       >
-                        <Plus className="w-3 h-3" />
+                        +
                       </button>
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-12 space-y-3">
-                <div className="w-12 h-12 rounded-full bg-[#EAF3EE] text-[#133E2B] flex items-center justify-center mx-auto">
-                  <ShoppingBag className="w-6 h-6" />
-                </div>
-                <h4 className="font-serif font-bold text-base text-gray-800">Your WhatsApp Bag is Empty</h4>
-                <p className="text-xs text-gray-500 max-w-xs mx-auto">
-                  Explore our aged rice varieties and 26kg wholesale sacks to order directly via WhatsApp.
-                </p>
+              <div className="text-center py-16 space-y-3">
+                <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto" />
+                <p className="text-gray-600 text-sm font-semibold">Your shopping bag is empty.</p>
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold transition cursor-pointer"
+                  className="px-5 py-2 rounded-full bg-[#52B82E] text-white text-xs font-bold cursor-pointer hover:bg-[#439E23] transition"
                 >
-                  Explore Rice Varieties
+                  Browse Rice Varieties
                 </button>
               </div>
             )}
@@ -352,45 +315,9 @@ export default function CartDrawer({
 
           {/* Cart Footer: Summary & Checkout Actions */}
           {cartItems.length > 0 && (
-            <div className="border-t border-[#E6E2D8] bg-[#FBF9F5] p-5 space-y-3">
+            <div className="border-t border-gray-200 bg-[#FAF8F5] p-5 space-y-3">
               
-              {/* Coupon Engine */}
-              {!appliedCoupon ? (
-                <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      placeholder="Coupon: MILL50 or WELCOME10"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="w-full text-xs pl-7 pr-2 py-2 rounded-lg border border-[#E6E2D8] bg-white uppercase font-bold focus:outline-none focus:border-[#133E2B]"
-                    />
-                    <Tag className="w-3.5 h-3.5 text-gray-400 absolute left-2 top-2.5" />
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-3 py-2 bg-[#133E2B] hover:bg-[#1C523B] text-white text-xs font-bold rounded-lg transition cursor-pointer"
-                  >
-                    Apply
-                  </button>
-                </form>
-              ) : (
-                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg text-xs text-emerald-800">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Coupon <strong>{appliedCoupon.code}</strong> applied (-₹{appliedCoupon.discount})</span>
-                  </div>
-                  <button
-                    onClick={() => setAppliedCoupon(null)}
-                    className="text-xs text-red-600 hover:underline font-bold cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                </div>
-              )}
-              {couponError && <p className="text-[11px] text-red-600 font-semibold">{couponError}</p>}
-
-              {/* Price Breakdown */}
+              {/* Clean Price Breakdown without fake fees */}
               <div className="space-y-1.5 text-xs text-gray-600 pt-1">
                 <div className="flex justify-between">
                   <span>Bag Subtotal:</span>
@@ -402,132 +329,122 @@ export default function CartDrawer({
                     <span>-₹{itemSavings}</span>
                   </div>
                 )}
-                {appliedCoupon && (
-                  <div className="flex justify-between text-emerald-700">
-                    <span>Coupon Discount:</span>
-                    <span>-₹{appliedCoupon.discount}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span>
-                    Platform Fee <span className="line-through text-gray-400">₹23</span>:
-                  </span>
-                  <span className="font-bold text-emerald-700">₹0 FREE</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>
-                    COD Handling <span className="line-through text-gray-400">₹10</span>:
-                  </span>
-                  <span className="font-bold text-emerald-700">₹0 FREE</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>
-                    Doorstep Delivery <span className="line-through text-gray-400">₹70</span>:
-                  </span>
-                  <span className="text-emerald-700 font-bold">
-                    ₹0 FREE
-                  </span>
-                </div>
                 <div className="flex justify-between text-sm font-bold text-gray-900 pt-2 border-t border-gray-300">
                   <span>Total Payable:</span>
-                  <span className="font-serif text-lg text-[#133E2B]">₹{finalTotal}</span>
+                  <span className="font-serif text-lg text-[#F39C12] font-black">₹{finalTotal}</span>
                 </div>
               </div>
 
-              {/* WhatsApp Checkout Section (Exclusive Order Method) */}
+              {/* WhatsApp Checkout Section */}
               <div className="pt-2 space-y-3">
                 {/* Optional Chennai Delivery Details Collapsible */}
                 <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-2xs">
                   <button
                     type="button"
                     onClick={() => setShowAddressFields(!showAddressFields)}
-                    className="w-full p-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition cursor-pointer"
+                    className="w-full px-3.5 py-2.5 text-left text-xs font-bold text-gray-700 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer"
                   >
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#C59B27] shrink-0" />
-                      <span className="text-xs font-bold text-[#133E2B]">
-                        {customerName.trim()
-                          ? `Deliver to: ${customerName.trim()} (${deliveryArea.trim() || 'Chennai'})`
-                          : 'Add Chennai Delivery Address (Optional)'}
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-emerald-700 font-semibold underline">
-                      {showAddressFields ? 'Hide' : customerName.trim() ? 'Change' : '+ Add Address'}
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#52B82E]" />
+                      <span>Chennai Delivery Address (Optional)</span>
+                    </span>
+                    <span className="text-[10px] text-[#52B82E] font-bold">
+                      {showAddressFields ? 'Hide ▲' : 'Add Details ▼'}
                     </span>
                   </button>
 
                   {showAddressFields && (
-                    <div className="p-3 pt-1 border-t border-gray-100 space-y-2 bg-[#FBF9F5] animate-fade-in">
-                      <input
-                        type="text"
-                        placeholder="Full Name (e.g. Ramesh Babu)"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full text-xs p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#133E2B] bg-white"
-                      />
-                      <input
-                        type="tel"
-                        placeholder="10-Digit Mobile Number"
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
-                        className="w-full text-xs p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#133E2B] bg-white"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Door No., Street Name, Landmark"
-                        value={deliveryAddress}
-                        onChange={(e) => setDeliveryAddress(e.target.value)}
-                        className="w-full text-xs p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#133E2B] bg-white"
-                      />
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="p-3.5 pt-1 space-y-2.5 border-t border-gray-100 bg-[#FCFBF8] text-xs">
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
+                          Your Name:
+                        </label>
                         <input
                           type="text"
-                          placeholder="Chennai Area (e.g. Porur)"
-                          value={deliveryArea}
-                          onChange={(e) => setDeliveryArea(e.target.value)}
-                          className="w-full text-xs p-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#133E2B] bg-white"
-                        />
-                        <input
-                          type="text"
-                          placeholder="PIN (600xxx)"
-                          value={deliveryPincode}
-                          onChange={(e) => handlePincodeChange(e.target.value)}
-                          maxLength={6}
-                          className={`w-full text-xs p-2 rounded-lg border focus:outline-none bg-white ${
-                            pincodeError ? 'border-red-500 bg-red-50 text-red-900 font-bold' : 'border-gray-300 focus:border-[#133E2B]'
-                          }`}
+                          placeholder="e.g. Anand Kumar"
+                          value={customerName}
+                          onChange={(e) => setCustomerName(e.target.value)}
+                          className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-[#52B82E]"
                         />
                       </div>
-                      {pincodeError && (
-                        <div className="p-2 bg-red-50 border border-red-200 rounded-lg text-[10px] text-red-700 font-semibold flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3 shrink-0 text-red-600" />
-                          <span>{pincodeError}</span>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
+                            Phone Number:
+                          </label>
+                          <input
+                            type="tel"
+                            placeholder="e.g. 98401xxxxx"
+                            value={customerPhone}
+                            onChange={(e) => setCustomerPhone(e.target.value)}
+                            className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-[#52B82E]"
+                          />
                         </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
+                            Chennai PIN Code:
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="600xxx"
+                            value={deliveryPincode}
+                            onChange={(e) => handlePincodeChange(e.target.value)}
+                            className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white font-mono focus:outline-none focus:border-[#52B82E]"
+                            maxLength={6}
+                          />
+                        </div>
+                      </div>
+
+                      {pincodeError && (
+                        <p className="text-[10px] text-red-600 font-semibold">{pincodeError}</p>
                       )}
-                      <p className="text-[10px] text-gray-500 italic">
-                        Saved details are auto-included in your WhatsApp message.
-                      </p>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
+                          Door / Flat No. &amp; Street:
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. No. 12, Gandhi Road"
+                          value={deliveryAddress}
+                          onChange={(e) => setDeliveryAddress(e.target.value)}
+                          className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-[#52B82E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
+                          Area / Landmark (Chennai):
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Porur, Kundrathur, Tambaram, T. Nagar"
+                          value={deliveryArea}
+                          onChange={(e) => setDeliveryArea(e.target.value)}
+                          className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-[#52B82E]"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Primary WhatsApp Order Action Button */}
+                {/* Primary WhatsApp Checkout Button */}
                 <button
                   type="button"
                   onClick={handleWhatsAppCheckout}
-                  disabled={isSubmitting || Boolean(pincodeError)}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] active:bg-[#1da850] text-white font-extrabold text-sm sm:text-base shadow-md hover:shadow-lg transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 hover:scale-[1.01] active:scale-[0.99]"
+                  disabled={isSubmitting || (deliveryPincode.length === 6 && !isChennaiPincode(deliveryPincode))}
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] active:bg-[#1da850] text-white font-extrabold text-sm sm:text-base shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
                   <span>
-                    {isSubmitting ? 'Opening WhatsApp...' : `Send Order to WhatsApp • ₹${finalTotal}`}
+                    {isSubmitting ? 'Logging Order...' : `Proceed to WhatsApp Checkout • ₹${finalTotal}`}
                   </span>
                 </button>
 
-                <div className="p-2 bg-[#EAF3EE] rounded-xl border border-emerald-200/70 text-[11px] text-[#133E2B] flex items-center justify-center gap-1.5 text-center font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                  <span>Direct Mill Desk (+91 99621 19810) • Cash / UPI on Delivery</span>
-                </div>
+                <p className="text-[11px] text-gray-500 text-center font-medium">
+                  Doorstep Delivery Across Chennai • Pay via Cash or UPI on Arrival
+                </p>
               </div>
             </div>
           )}
