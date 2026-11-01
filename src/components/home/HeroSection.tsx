@@ -79,7 +79,7 @@ export default function HeroSection({
                 onClick={onNavigateToCatalog}
                 className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-full bg-[#52B82E] hover:bg-[#439E23] active:bg-[#38881C] text-white text-base sm:text-lg font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 group"
               >
-                <span>Let the shopping begin</span>
+                <span>Explore Rice Varieties</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
 
