@@ -546,7 +546,22 @@ export default function Home() {
               totalCartCount={totalCartCount}
             />
 
-            {/* Direct Products Catalog on Home Page matching "Our Rice Products" */}
+            {/* Categories Showcase */}
+            <CategoriesGrid
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={(catId) => {
+                setSelectedCategory(catId);
+                const el = document.getElementById('products-catalog');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  handleNavigate('products', { category: catId });
+                }
+              }}
+            />
+
+            {/* Direct Products Catalog on Home Page */}
             <div id="products-catalog" className="scroll-mt-20">
               <CatalogView
                 products={products}
@@ -557,8 +572,8 @@ export default function Home() {
                 onSearchChange={setSearchQuery}
                 onSelectProduct={handleSelectProduct}
                 onAddToCart={handleAddToCart}
-                onDirectWhatsApp={(prod, weight, qty) =>
-                  handleDirectWhatsAppProduct(prod, weight, qty || 1)
+                onDirectWhatsApp={(prod, weight) =>
+                  handleDirectWhatsAppProduct(prod, weight, 1)
                 }
                 cartItemsCountMap={cartItemsCountMap}
               />
@@ -583,8 +598,8 @@ export default function Home() {
             onSearchChange={setSearchQuery}
             onSelectProduct={handleSelectProduct}
             onAddToCart={handleAddToCart}
-            onDirectWhatsApp={(prod, weight, qty) =>
-              handleDirectWhatsAppProduct(prod, weight, qty || 1)
+            onDirectWhatsApp={(prod, weight) =>
+              handleDirectWhatsAppProduct(prod, weight, 1)
             }
             cartItemsCountMap={cartItemsCountMap}
           />
@@ -869,12 +884,12 @@ export default function Home() {
         {totalCartCount > 0 && (
           <button
             onClick={() => setIsCartOpen(true)}
-            className="bg-[#111827] hover:bg-black text-white px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full shadow-2xl border border-gray-300 flex items-center gap-2 text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
-            title="Open Shopping Cart"
+            className="bg-[#133E2B] hover:bg-[#1C523B] text-white px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-[#C59B27] flex items-center gap-2 text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
+            title="Open WhatsApp Order Bag"
           >
-            <ShoppingCart className="w-4 h-4 text-[#F5A623]" />
+            <ShoppingCart className="w-4 h-4 text-[#C59B27]" />
             <span>Bag ({totalCartCount})</span>
-            <span className="bg-[#52B82E] text-white text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
+            <span className="bg-[#C59B27] text-[#0C2B1D] text-[10px] font-extrabold px-1.5 py-0.5 rounded-full">
               ₹{cartSubtotal.toLocaleString('en-IN')}
             </span>
           </button>
