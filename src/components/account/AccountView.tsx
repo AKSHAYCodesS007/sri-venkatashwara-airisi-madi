@@ -119,8 +119,8 @@ export default function AccountView({
   const handleSaveAddress = (e: React.FormEvent) => {
     e.preventDefault();
     const pin = addrPincode.trim();
-    if (!pin.startsWith('600') || pin.length !== 6) {
-      setAddrError('Delivery is strictly limited to Chennai (pincodes starting with 600xxx).');
+    if (!/^[1-9][0-9]{5}$/.test(pin) || pin.length !== 6) {
+      setAddrError('Please enter a valid 6-digit Indian pincode.');
       return;
     }
     setAddrError('');
@@ -468,7 +468,7 @@ export default function AccountView({
                       {isEditingAddress === 'new' ? 'Add New Chennai Address' : 'Edit Delivery Address'}
                     </h3>
                     <span className="text-[10px] text-emerald-800 font-bold block mt-0.5">
-                      📍 Direct Doorstep Delivery Exclusively in Chennai (PIN 600xxx)
+                      📍 Pan-India Doorstep Delivery Across All Over India
                     </span>
                   </div>
                   <button
@@ -555,22 +555,22 @@ export default function AccountView({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Chennai Pincode (600xxx)</label>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">PIN Code (6 Digits)</label>
                     <input
                       type="text"
                       value={addrPincode}
                       onChange={(e) => {
                         const val = e.target.value.replace(/\D/g, '').slice(0, 6);
                         setAddrPincode(val);
-                        if (val.length === 6 && !val.startsWith('600')) {
-                          setAddrError('Delivery is limited to Chennai (PIN 600xxx).');
+                        if (val.length === 6 && !/^[1-9][0-9]{5}$/.test(val)) {
+                          setAddrError('Please enter a valid 6-digit Indian PIN code.');
                         } else {
                           setAddrError('');
                         }
                       }}
                       maxLength={6}
                       required
-                      placeholder="e.g. 600069"
+                      placeholder="e.g. 560001, 110001, 600069"
                       className={`w-full text-xs p-2.5 rounded-lg border bg-white ${
                         addrError ? 'border-red-500 bg-red-50 text-red-900' : 'border-gray-300'
                       }`}

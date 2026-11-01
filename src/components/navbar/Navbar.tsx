@@ -73,7 +73,7 @@ export default function Navbar({
               || {storeInfo.invocation || "ஸ்ரீ குழந்தை அம்மன் துணை"} ||
             </span>
             <span className="hidden lg:inline text-[11px] text-[#D5E6DC] truncate">
-              • 26kg Direct Mill Sacks • Exclusively Delivering Across Chennai City &amp; Suburbs
+              • 26kg Direct Mill Sacks • Pan-India Doorstep Delivery Across All Over India
             </span>
           </div>
 

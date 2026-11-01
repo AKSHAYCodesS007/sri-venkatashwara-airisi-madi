@@ -25,7 +25,7 @@ export const STORE_INFO: StoreInfo = {
   gstin: "33BDWPJ4019A1ZT",
   freeDeliveryThreshold: 999,
   logo: "/images/logo.png",
-  serviceArea: "Exclusively Chennai City & Suburbs (PIN 600xxx)"
+  serviceArea: "All Over India (Pan-India Doorstep Delivery)"
 };
 
 export const CATEGORIES: Category[] = [
@@ -632,13 +632,13 @@ export const FAQS: FaqItem[] = [
     category: "delivery",
     categoryName: "Delivery & 26kg Sacks",
     question: "Which locations do you deliver to, and what are the charges?",
-    answer: "We deliver EXCLUSIVELY across Chennai city and its surrounding suburbs (all Chennai pincodes starting with 600xxx, including Kundrathur, Chiikkarayapuram, Porur, Kolapakkam, Tambaram, Chromepet, Guindy, Anna Nagar, T. Nagar, Mylapore, Velachery, OMR, etc.). Delivery is completely FREE on all orders over ₹999. Deliveries are dispatched directly from our Chiikkarayapuram Mandi & Kolapakkam Modern Rice Mill within 24 to 48 hours."
+    answer: "We deliver ALL OVER INDIA! Doorstep delivery is available across all Indian states, cities, and pincodes. Orders are freshly milled and dispatched directly from our Chiikkarayapuram Mandi & Kolapakkam Modern Rice Mill within 24 to 48 hours."
   },
   {
     category: "delivery",
     categoryName: "Delivery & 26kg Sacks",
-    question: "Do you deliver outside Chennai?",
-    answer: "Our retail doorstep delivery is strictly limited to Chennai city and surrounding suburbs (PIN 600xxx). For bulk commercial truck-load orders (50+ bags of 26kg) outside Chennai across Tamil Nadu, please contact our managing proprietor on WhatsApp at +91 99621 19810."
+    question: "Do you deliver all over India?",
+    answer: "Yes! We deliver authentic 26kg rice sacks across all states and cities in India. For both domestic household orders and commercial bulk loads, we ship nationwide via trusted transport."
   },
   {
     category: "ordering",

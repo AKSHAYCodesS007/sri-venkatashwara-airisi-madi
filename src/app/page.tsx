@@ -287,7 +287,7 @@ export default function Home() {
     const finalTotal = itemTotal;
 
     // Retrieve saved guest delivery details if available
-    let guestInfo = { name: '', phone: '', address: '', area: '', pincode: '600' };
+    let guestInfo = { name: '', phone: '', address: '', area: '', pincode: '' };
     if (typeof window !== 'undefined') {
       try {
         const saved = localStorage.getItem('rice_guest_delivery_info');
@@ -308,8 +308,8 @@ export default function Home() {
       ],
       total: finalTotal,
       deliveryAddress: guestInfo.address.trim()
-        ? `${guestInfo.address.trim()}${guestInfo.area.trim() ? `, ${guestInfo.area.trim()}` : ''}, Chennai - ${guestInfo.pincode.trim() || '600xxx'}${guestInfo.name.trim() ? ` (${guestInfo.name.trim()}, ${guestInfo.phone.trim()})` : ''}`
-        : 'Doorstep Cash/UPI on Delivery (Chennai City & Suburbs)',
+        ? `${guestInfo.address.trim()}${guestInfo.area.trim() ? `, ${guestInfo.area.trim()}` : ''}${guestInfo.pincode.trim() ? ` - PIN: ${guestInfo.pincode.trim()}` : ''}${guestInfo.name.trim() ? ` (${guestInfo.name.trim()}, ${guestInfo.phone.trim()})` : ''}`
+        : 'Doorstep Delivery (All Over India)',
       paymentMethod: 'WhatsApp Order (Cash / UPI on Delivery)',
     };
 
@@ -324,7 +324,7 @@ export default function Home() {
         total: finalTotal,
         status: 'Order Placed',
         currentStep: 1,
-        deliveryAddress: orderPayload.deliveryAddress || 'Chennai Doorstep',
+        deliveryAddress: orderPayload.deliveryAddress || 'Doorstep Delivery (All Over India)',
         paymentMethod: 'WhatsApp Order (Cash / UPI on Delivery)',
         trackingUpdates: [
           {
@@ -341,7 +341,7 @@ export default function Home() {
 
     // Build WhatsApp Message with the newly generated Order ID
     let text = `🌾 *NEW RICE ORDER — ${storeInfo.name.toUpperCase()}*\n`;
-    text += `📍 *Service Area: Exclusively Chennai City & Suburbs*\n`;
+    text += `📍 *Service Area: All Over India (Pan-India Delivery)*\n`;
     text += `🔖 *Order Tracking ID:* #${newOrder.orderId}\n`;
     if (guestInfo.name.trim()) {
       text += `👤 *Customer:* ${guestInfo.name.trim()}${guestInfo.phone.trim() ? ` (${guestInfo.phone.trim()})` : ''}\n`;
@@ -352,7 +352,7 @@ export default function Home() {
     text += `\n*ITEMS ORDERED:*\n`;
     text += `1. *${product.name}* (${weight})\n   Qty: ${quantity} bag(s) @ ₹${weightObj.price} = ₹${itemTotal}\n`;
     text += `\n*TOTAL PAYABLE (COD / UPI): ₹${finalTotal}*`;
-    text += `\n\n_Vanakkam! Please confirm dispatch schedule to Chennai doorstep. Payment via Cash/UPI on arrival._`;
+    text += `\n\n_Vanakkam! Please confirm dispatch and shipping schedule to delivery address. Payment via Cash / UPI on arrival._`;
 
     const encoded = encodeURIComponent(text);
     const url = `https://wa.me/${storeInfo.whatsappNumber}?text=${encoded}`;

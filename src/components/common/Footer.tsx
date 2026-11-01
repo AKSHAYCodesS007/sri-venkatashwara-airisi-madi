@@ -35,10 +35,10 @@ export default function Footer({ storeInfo, onNavigate }: FooterProps) {
             </div>
             <div>
               <h4 className="font-serif font-bold text-sm text-white">
-                Direct Mill Supply &amp; Delivery Exclusively Across Chennai
+                Direct Mill Supply &amp; Pan-India Delivery Across All Over India
               </h4>
               <p className="text-xs text-[#AECDBB]">
-                Delivering 26kg sacks directly to homes, caterers &amp; restaurants across Chennai city and suburbs.
+                Delivering 26kg sacks directly to homes, caterers &amp; restaurants all over India.
               </p>
             </div>
           </div>
@@ -85,7 +85,7 @@ export default function Footer({ storeInfo, onNavigate }: FooterProps) {
             </div>
 
             <p className="text-xs text-[#C2D7CB] leading-relaxed max-w-sm">
-              Wholesale rice merchant &amp; modern rice mill supplying pure, sortex-cleaned boiled, steam, raw, and idly rice in wholesale 26kg sacks direct from mill godowns exclusively across Chennai and surrounding suburbs.
+              Wholesale rice merchant &amp; modern rice mill supplying pure, sortex-cleaned boiled, steam, raw, and idly rice in wholesale 26kg sacks direct from mill godowns across all states and cities in India.
             </p>
 
             <div className="p-3 rounded-xl bg-[#0D2E1F] border border-[#1C523B] space-y-1 text-xs">

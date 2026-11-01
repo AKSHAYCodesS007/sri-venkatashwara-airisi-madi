@@ -40,9 +40,9 @@ export default function CartDrawer({
   onOrderPlaced,
   onCreateOrderService,
 }: CartDrawerProps) {
-  const isChennaiPincode = (pin: string) => {
+  const isIndianPincode = (pin: string) => {
     const cleaned = pin.trim();
-    return /^600\d{3}$/.test(cleaned);
+    return /^[1-9][0-9]{5}$/.test(cleaned);
   };
 
   const [showAddressFields, setShowAddressFields] = useState(false);
@@ -52,7 +52,7 @@ export default function CartDrawer({
   const [customerPhone, setCustomerPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryArea, setDeliveryArea] = useState('');
-  const [deliveryPincode, setDeliveryPincode] = useState('600');
+  const [deliveryPincode, setDeliveryPincode] = useState('');
   const [pincodeError, setPincodeError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -98,13 +98,11 @@ export default function CartDrawer({
     const digits = val.replace(/\D/g, '').slice(0, 6);
     setDeliveryPincode(digits);
     if (digits.length === 6) {
-      if (!digits.startsWith('600')) {
-        setPincodeError('⚠️ Delivery is currently limited ONLY to Chennai (PIN starting with 600xxx).');
+      if (!/^[1-9][0-9]{5}$/.test(digits)) {
+        setPincodeError('⚠️ Please enter a valid 6-digit Indian PIN code.');
       } else {
         setPincodeError('');
       }
-    } else if (digits.length > 0 && !'600'.startsWith(digits.slice(0, Math.min(3, digits.length)))) {
-      setPincodeError('⚠️ Chennai pincodes begin with 600.');
     } else {
       setPincodeError('');
     }
@@ -122,10 +120,8 @@ export default function CartDrawer({
   const handleWhatsAppCheckout = async () => {
     if (cartItems.length === 0 || isSubmitting) return;
 
-    if (deliveryPincode && deliveryPincode.length === 6 && !isChennaiPincode(deliveryPincode)) {
-      alert(
-        'Delivery is strictly limited to Chennai city & suburbs (PIN starting with 600xxx).\n\nFor bulk commercial lorry loads outside Chennai, please contact our managing proprietor directly.'
-      );
+    if (deliveryPincode && deliveryPincode.length === 6 && !isIndianPincode(deliveryPincode)) {
+      alert('Please enter a valid 6-digit Indian PIN code for Pan-India doorstep delivery.');
       return;
     }
 
@@ -133,8 +129,8 @@ export default function CartDrawer({
     saveGuestDeliveryInfo();
 
     const formattedAddress = deliveryAddress.trim()
-      ? `${deliveryAddress.trim()}${deliveryArea.trim() ? `, ${deliveryArea.trim()}` : ''}, Chennai - ${deliveryPincode.trim() || '600xxx'}${customerName.trim() ? ` (${customerName.trim()}, ${customerPhone.trim()})` : ''}`
-      : 'Doorstep Cash/UPI on Delivery (Chennai City & Suburbs)';
+      ? `${deliveryAddress.trim()}${deliveryArea.trim() ? `, ${deliveryArea.trim()}` : ''}${deliveryPincode.trim() ? ` - PIN: ${deliveryPincode.trim()}` : ''}${customerName.trim() ? ` (${customerName.trim()}, ${customerPhone.trim()})` : ''}`
+      : 'Doorstep Delivery (All Over India)';
 
     const orderPayload: Partial<Order> = {
       items: cartItems.map((item) => ({
@@ -176,7 +172,7 @@ export default function CartDrawer({
 
     // Build Clean Direct WhatsApp Message
     let text = `🌾 *NEW RICE ORDER — ${storeInfo.name.toUpperCase()}*\n`;
-    text += `📍 *Service Area: Exclusively Chennai City & Suburbs*\n`;
+    text += `📍 *Service Area: All Over India (Pan-India Delivery)*\n`;
     if (createdOrder?.orderId) {
       text += `🔖 *Order Tracking ID:* #${createdOrder.orderId}\n`;
     }
@@ -193,7 +189,7 @@ export default function CartDrawer({
     });
 
     text += `\n*TOTAL PAYABLE (COD / UPI): ₹${finalTotal}*`;
-    text += `\n\n_Vanakkam! Please confirm dispatch schedule to Chennai doorstep. Payment via Cash/UPI on arrival._`;
+    text += `\n\n_Vanakkam! Please confirm dispatch and shipping schedule to delivery address. Payment via Cash / UPI on arrival._`;
 
     const encoded = encodeURIComponent(text);
     const url = `https://wa.me/${storeInfo.whatsappNumber}?text=${encoded}`;
@@ -237,10 +233,10 @@ export default function CartDrawer({
           <div className="bg-[#FAF5E9] border-b border-[#EADFC7] px-6 py-2.5 flex items-center justify-between text-xs text-[#222E26]">
             <div className="flex items-center gap-1.5 font-bold text-[11px]">
               <MapPin className="w-3.5 h-3.5 text-[#52B82E] flex-shrink-0" />
-              <span>Doorstep Delivery: <strong>Exclusively Chennai Only</strong></span>
+              <span>Doorstep Delivery: <strong>All Over India (Pan-India)</strong></span>
             </div>
             <span className="text-[10px] bg-[#111827] text-white px-2 py-0.5 rounded font-extrabold uppercase tracking-wider">
-              PIN 600xxx
+              All PIN Codes
             </span>
           </div>
 
@@ -346,7 +342,7 @@ export default function CartDrawer({
                   >
                     <span className="flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-[#52B82E]" />
-                      <span>Chennai Delivery Address (Optional)</span>
+                      <span>Delivery Address (Pan-India)</span>
                     </span>
                     <span className="text-[10px] text-[#52B82E] font-bold">
                       {showAddressFields ? 'Hide ▲' : 'Add Details ▼'}
@@ -383,11 +379,11 @@ export default function CartDrawer({
                         </div>
                         <div>
                           <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
-                            Chennai PIN Code:
+                            PIN Code (6 Digits):
                           </label>
                           <input
                             type="text"
-                            placeholder="600xxx"
+                            placeholder="e.g. 560001, 110001, 600001"
                             value={deliveryPincode}
                             onChange={(e) => handlePincodeChange(e.target.value)}
                             className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white font-mono focus:outline-none focus:border-[#52B82E]"
@@ -415,11 +411,11 @@ export default function CartDrawer({
 
                       <div>
                         <label className="block text-[10px] font-bold text-gray-600 uppercase mb-0.5">
-                          Area / Landmark (Chennai):
+                          City, State & Landmark (All Over India):
                         </label>
                         <input
                           type="text"
-                          placeholder="e.g. Porur, Kundrathur, Tambaram, T. Nagar"
+                          placeholder="e.g. Mumbai, Maharashtra or Bengaluru, Karnataka"
                           value={deliveryArea}
                           onChange={(e) => setDeliveryArea(e.target.value)}
                           className="w-full text-xs px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-[#52B82E]"
@@ -433,7 +429,7 @@ export default function CartDrawer({
                 <button
                   type="button"
                   onClick={handleWhatsAppCheckout}
-                  disabled={isSubmitting || (deliveryPincode.length === 6 && !isChennaiPincode(deliveryPincode))}
+                  disabled={isSubmitting || (deliveryPincode.length === 6 && !isIndianPincode(deliveryPincode))}
                   className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] active:bg-[#1da850] text-white font-extrabold text-sm sm:text-base shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
@@ -443,7 +439,7 @@ export default function CartDrawer({
                 </button>
 
                 <p className="text-[11px] text-gray-500 text-center font-medium">
-                  Doorstep Delivery Across Chennai • Pay via Cash or UPI on Arrival
+                  Pan-India Doorstep Delivery Across All Over India • Cash or UPI on Arrival
                 </p>
               </div>
             </div>

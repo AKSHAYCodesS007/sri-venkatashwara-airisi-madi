@@ -39,7 +39,7 @@ export default function HeroSection({
             {/* Super Badge */}
             <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#EAF3EE] border border-[#133E2B]/20 text-[#133E2B] text-[10px] sm:text-xs font-bold tracking-wide shadow-2xs">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C59B27] animate-pulse"></span>
-              <span className="truncate">|| ஸ்ரீ குழந்தை அம்மன் துணை || Rice Wholesale Merchant • Exclusively in Chennai</span>
+              <span className="truncate">|| ஸ்ரீ குழந்தை அம்மன் துணை || Rice Wholesale Merchant • Pan-India Delivery All Over India</span>
             </div>
 
             {/* Main Headline */}
@@ -53,7 +53,7 @@ export default function HeroSection({
 
             {/* Subtext */}
             <p className="text-xs sm:text-base text-[#56645C] leading-relaxed max-w-2xl font-normal">
-              Direct from <strong>Sri Venkateshwara Arisi Mandy</strong> (Kundrathur Main Road, Chiikkarayapuram) and <strong>Sri Venkateswara Modern Rice Mill</strong> (Kolapakkam). Pure, sortex-cleaned Boiled, Steam, Raw, and Idly rice in authentic 26kg sacks delivered exclusively to homes and kitchens across Chennai.
+              Direct from <strong>Sri Venkateshwara Arisi Mandy</strong> (Kundrathur Main Road, Chiikkarayapuram) and <strong>Sri Venkateswara Modern Rice Mill</strong> (Kolapakkam). Pure, sortex-cleaned Boiled, Steam, Raw, and Idly rice in authentic 26kg sacks delivered directly to homes, caterers and businesses all over India.
             </p>
 
             {/* Quality Seals List */}
@@ -72,7 +72,7 @@ export default function HeroSection({
               </div>
               <div className="flex items-center gap-2 text-[11px] sm:text-xs font-semibold text-[#19241F]">
                 <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C59B27] flex-shrink-0" />
-                <span>Doorstep Delivery Across Chennai City Only</span>
+                <span>Pan-India Doorstep Delivery Across All Over India</span>
               </div>
             </div>
 
