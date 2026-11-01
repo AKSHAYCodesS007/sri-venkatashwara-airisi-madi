@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { Product, Category } from '@/types';
 import ProductCard from './ProductCard';
-import { Search, SlidersHorizontal, Sparkles, Filter, X } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 
 interface CatalogViewProps {
   products: Product[];
@@ -30,7 +30,7 @@ export default function CatalogView({
   onDirectWhatsApp,
   cartItemsCountMap,
 }: CatalogViewProps) {
-  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'rating'>('featured');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'name'>('featured');
   const [inStockOnly, setInStockOnly] = useState(false);
 
   // Filter and sort products
@@ -61,196 +61,150 @@ export default function CatalogView({
 
     // Sorting
     if (sortBy === 'price-asc') {
-      result.sort((a, b) => a.weights[0].price - b.weights[0].price);
+      result.sort((a, b) => (a.weights[0]?.price || 0) - (b.weights[0]?.price || 0));
     } else if (sortBy === 'price-desc') {
-      result.sort((a, b) => b.weights[0].price - a.weights[0].price);
-    } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
+      result.sort((a, b) => (b.weights[0]?.price || 0) - (a.weights[0]?.price || 0));
+    } else if (sortBy === 'name') {
+      result.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     return result;
   }, [products, selectedCategory, searchQuery, inStockOnly, sortBy]);
 
   return (
-    <div className="py-6 sm:py-8 bg-[#FBF9F5] min-h-screen">
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
+    <section className="py-8 sm:py-12 bg-white min-h-[600px]">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         
-        {/* Header & Controls */}
-        <div className="mb-6 space-y-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-[#C59B27] font-bold mb-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                Direct From Godowns
-              </div>
-              <h1 className="font-serif text-2xl sm:text-3xl font-extrabold text-[#133E2B]">
-                Heritage &amp; Aged Rice Catalog
-              </h1>
-              <p className="text-xs text-[#56645C] mt-1">
-                Browse our naturally aged grain batches, de-stoned and bagged freshly upon order.
-              </p>
-            </div>
+        {/* Section Heading matching reference */}
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-4xl font-black text-[#111111] tracking-tight">
+            Our Rice Products
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-xl mx-auto font-medium">
+            Freshly milled authentic 26kg sacks supplied directly from Sri Venkateshwara Arisi Mandy
+          </p>
+        </div>
 
-            {/* Filter controls row */}
-            <div className="flex flex-wrap items-center gap-2.5">
-              {/* Search input in catalog */}
-              <div className="relative min-w-[200px]">
-                <input
-                  type="text"
-                  placeholder="Filter varieties..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full text-xs pl-8 pr-7 py-2 rounded-xl border border-[#E6E2D8] bg-white focus:outline-none focus:border-[#133E2B]"
-                />
-                <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400" />
-                {searchQuery && (
-                  <button
-                    onClick={() => onSearchChange('')}
-                    className="absolute right-2.5 top-2 text-gray-400 hover:text-black text-xs font-bold cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
+        {/* Category Filter Tabs with Light Green & Gold Theme */}
+        <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap mb-6 sm:mb-8 px-1">
+          {/* ALL tab */}
+          <button
+            type="button"
+            onClick={() => onSelectCategory('all')}
+            className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-black tracking-wider uppercase transition-all cursor-pointer ${
+              selectedCategory === 'all'
+                ? 'bg-[#1E1E1E] text-white shadow-sm'
+                : 'bg-[#F4F4F4] hover:bg-[#EAF5E5] text-[#222222] hover:text-[#2E7D1A]'
+            }`}
+          >
+            ALL
+          </button>
 
-              {/* Sort selector */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="text-xs px-3 py-2 rounded-xl border border-[#E6E2D8] bg-white text-gray-700 font-semibold focus:outline-none focus:border-[#133E2B] cursor-pointer"
-              >
-                <option value="featured">Featured First</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Highest Rated</option>
-              </select>
-
-              {/* In-Stock Toggle */}
-              <button
-                type="button"
-                onClick={() => setInStockOnly(!inStockOnly)}
-                className={`text-xs px-3 py-2 rounded-xl border font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-                  inStockOnly
-                    ? 'bg-[#133E2B] text-white border-[#133E2B]'
-                    : 'bg-white text-gray-700 border-[#E6E2D8] hover:border-gray-400'
-                }`}
-              >
-                <Filter className="w-3.5 h-3.5" />
-                <span>In Stock Only</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Category Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-[#E6E2D8]">
-            <button
-              onClick={() => onSelectCategory('all')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-                selectedCategory === 'all'
-                  ? 'bg-[#133E2B] text-white shadow-xs'
-                  : 'bg-white text-gray-700 border border-[#E6E2D8] hover:bg-gray-50'
-              }`}
-            >
-              All ({products.length})
-            </button>
-            {categories
-              .filter((c) => c.id !== 'all')
-              .map((cat) => {
+          {/* Dynamic Category Tabs */}
+          {categories
+            .filter((c) => c.id !== 'all')
+            .map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
                 <button
+                  type="button"
                   key={cat.id}
                   onClick={() => onSelectCategory(cat.id)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                  className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-md text-xs sm:text-sm font-black tracking-wider uppercase transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#133E2B] text-white shadow-xs'
-                      : 'bg-white text-gray-700 border border-[#E6E2D8] hover:bg-gray-50'
+                      ? 'bg-[#1E1E1E] text-white shadow-sm'
+                      : 'bg-[#F4F4F4] hover:bg-[#EAF5E5] text-[#222222] hover:text-[#2E7D1A]'
                   }`}
                 >
-                  {cat.name} ({cat.count})
+                  {cat.name}
                 </button>
               );
             })}
+        </div>
+
+        {/* Search & Sort Controls Bar */}
+        <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#FAF8F5] p-2.5 sm:p-3 rounded-xl border border-gray-200/80">
+          {/* Search bar */}
+          <div className="relative w-full sm:w-80">
+            <input
+              type="text"
+              placeholder="Search rice brand, variety, weight..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full text-xs pl-8 pr-7 py-2 rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-[#52B82E] transition-colors text-gray-800"
+            />
+            <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400" />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => onSearchChange('')}
+                className="absolute right-2.5 top-2 text-gray-400 hover:text-black text-xs font-bold cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Sort & In-stock options */}
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="text-xs px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 font-semibold focus:outline-none focus:border-[#52B82E] cursor-pointer"
+            >
+              <option value="featured">Featured First</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="name">Alphabetical (A-Z)</option>
+            </select>
+
+            <button
+              type="button"
+              onClick={() => setInStockOnly(!inStockOnly)}
+              className={`text-xs px-3 py-2 rounded-lg border font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                inStockOnly
+                  ? 'bg-[#1E1E1E] text-white border-[#1E1E1E]'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              <Filter className="w-3.5 h-3.5" />
+              <span>In Stock</span>
+            </button>
           </div>
         </div>
 
-        {/* Results Count & Active Filters Indicator */}
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-          <div>
-            Showing <strong className="text-gray-900">{filteredProducts.length}</strong> grain varieties
-            {searchQuery && (
-              <span> matching &ldquo;<span className="text-[#133E2B] font-semibold">{searchQuery}</span>&rdquo;</span>
-            )}
-          </div>
-          {(selectedCategory !== 'all' || searchQuery || inStockOnly) && (
+        {/* Product Grid */}
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-16 bg-[#FAF9F6] rounded-2xl border border-dashed border-gray-300">
+            <p className="text-gray-500 text-sm font-semibold">No rice products matched your search.</p>
             <button
+              type="button"
               onClick={() => {
-                onSelectCategory('all');
                 onSearchChange('');
+                onSelectCategory('all');
                 setInStockOnly(false);
               }}
-              className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 cursor-pointer"
+              className="mt-3 text-xs text-[#52B82E] font-bold underline cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" />
-              <span>Clear Filters</span>
+              Reset all filters
             </button>
-          )}
-        </div>
-
-        {/* Product Grid - 2 columns on mobile, 3-4 columns on tablet/desktop */}
-        {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
-            {filteredProducts.map((p) => {
-              const cartCount = cartItemsCountMap[p.id] || 0;
-              return (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  onSelectProduct={onSelectProduct}
-                  onAddToCart={onAddToCart}
-                  onDirectWhatsApp={onDirectWhatsApp}
-                  currentCartQty={cartCount}
-                />
-              );
-            })}
           </div>
         ) : (
-          /* Empty State */
-          <div className="bg-white rounded-2xl border border-[#E6E2D8] p-12 text-center max-w-lg mx-auto my-12 space-y-4">
-            <div className="w-16 h-16 rounded-full bg-[#FEF9EB] border border-[#E6CE8A] text-[#C59B27] flex items-center justify-center mx-auto text-3xl">
-              {products.length === 0 ? '🌾' : <Search className="w-6 h-6" />}
-            </div>
-            <h3 className="font-serif font-bold text-xl text-gray-900">
-              {products.length === 0 ? 'Catalog Freshly Reset' : 'No Rice Varieties Found'}
-            </h3>
-            <p className="text-xs text-gray-500 leading-relaxed">
-              {products.length === 0
-                ? 'All sample products have been removed. Our inventory is ready for fresh real grain batches.'
-                : "We couldn't find any grain batch matching your query. Try resetting your search or exploring our popular categories."}
-            </p>
-            {products.length > 0 ? (
-              <button
-                onClick={() => {
-                  onSelectCategory('all');
-                  onSearchChange('');
-                }}
-                className="px-4 py-2 rounded-xl bg-[#133E2B] text-white text-xs font-bold hover:bg-[#1C523B] transition cursor-pointer"
-              >
-                Reset Filters
-              </button>
-            ) : (
-              <a
-                href="https://wa.me/919962119810"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#133E2B] text-white text-xs font-semibold hover:bg-[#0C2B1D] transition shadow-md"
-              >
-                Inquire on WhatsApp Desk
-              </a>
-            )}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onSelectProduct={onSelectProduct}
+                onAddToCart={onAddToCart}
+                onDirectWhatsApp={onDirectWhatsApp}
+                currentCartQty={cartItemsCountMap[product.id] || 0}
+              />
+            ))}
           </div>
         )}
+
       </div>
-    </div>
+    </section>
   );
 }
