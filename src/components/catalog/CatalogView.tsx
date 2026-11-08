@@ -61,11 +61,11 @@ export default function CatalogView({
 
     // Sorting
     if (sortBy === 'price-asc') {
-      result.sort((a, b) => a.weights[0].price - b.weights[0].price);
+      result.sort((a, b) => (a.weights?.[0]?.price ?? 0) - (b.weights?.[0]?.price ?? 0));
     } else if (sortBy === 'price-desc') {
-      result.sort((a, b) => b.weights[0].price - a.weights[0].price);
+      result.sort((a, b) => (b.weights?.[0]?.price ?? 0) - (a.weights?.[0]?.price ?? 0));
     } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
+      result.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
     }
 
     return result;

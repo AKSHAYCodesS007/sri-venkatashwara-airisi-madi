@@ -43,11 +43,13 @@ export default function ProductModal({
 
   useEffect(() => {
     if (product) {
-      if (initialWeight && product.weights.some((w) => w.weight === initialWeight)) {
-        setSelectedWeight(initialWeight);
-      } else {
-        setSelectedWeight(product.defaultWeight || product.weights[0]?.weight || '5kg');
-      }
+      const wList = Array.isArray(product.weights) && product.weights.length > 0
+        ? product.weights
+        : [{ weight: product.defaultWeight || '26kg', price: 1850, originalPrice: 2000, inStock: true }];
+
+      const target = (initialWeight || product.defaultWeight || '').replace(/\s+/g, '').toLowerCase();
+      const found = wList.find((w) => w.weight.replace(/\s+/g, '').toLowerCase() === target);
+      setSelectedWeight(found ? found.weight : wList[0].weight);
       setQuantity(1);
       setAddedNotice(false);
     }
@@ -55,17 +57,20 @@ export default function ProductModal({
 
   if (!isOpen || !product) return null;
 
+  const weightsList = Array.isArray(product.weights) && product.weights.length > 0
+    ? product.weights
+    : [{ weight: product.defaultWeight || '26kg', price: 1850, originalPrice: 2000, inStock: true }];
+
   const currentWeightObj =
-    product.weights.find((w) => w.weight === selectedWeight) ||
-    product.weights[0] || {
-      weight: '5kg',
-      price: 300,
-      originalPrice: 350,
-    };
+    weightsList.find((w) => w.weight === selectedWeight) ||
+    weightsList.find(
+      (w) => w.weight.replace(/\s+/g, '').toLowerCase() === (selectedWeight || '').replace(/\s+/g, '').toLowerCase()
+    ) ||
+    weightsList[0];
 
   const lineTotal = currentWeightObj.price * quantity;
-  const originalLineTotal = currentWeightObj.originalPrice * quantity;
-  const totalSavings = originalLineTotal - lineTotal;
+  const originalLineTotal = (currentWeightObj.originalPrice || currentWeightObj.price) * quantity;
+  const totalSavings = Math.max(0, originalLineTotal - lineTotal);
 
   const handleAddToCart = () => {
     onAddToCart(product, selectedWeight, quantity);
@@ -110,11 +115,14 @@ export default function ProductModal({
             
             {/* Left: Product Image & Badges */}
             <div className="md:col-span-5 space-y-3">
-              <div className="relative aspect-square rounded-2xl overflow-hidden border border-[#E6E2D8] bg-[#F4F1EA] shadow-inner">
+              <div className="relative aspect-square rounded-2xl overflow-hidden border border-[#E6E2D8] bg-white p-3 shadow-inner flex items-center justify-center">
                 <img
-                  src={product.image}
+                  src={product.image || '/images/products/aks-bullet.jpg'}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/products/aks-bullet.jpg';
+                  }}
+                  className="max-h-full max-w-full object-contain"
                 />
                 <div className="absolute top-3 left-3 bg-[#133E2B] text-white text-[10px] font-bold px-2.5 py-1 rounded-md">
                   {product.aging}

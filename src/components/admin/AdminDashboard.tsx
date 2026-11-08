@@ -146,7 +146,7 @@ export default function AdminDashboard({
   const [formImage, setFormImage] = useState('');
   const [formInStock, setFormInStock] = useState(true);
   const [formWeights, setFormWeights] = useState<ProductWeight[]>([
-    { weight: '26 kg', price: 1850, originalPrice: 2000, inStock: true }
+    { weight: '26kg', price: 1850, originalPrice: 2000, inStock: true }
   ]);
 
   // Dashboard Filters & Search
@@ -341,7 +341,7 @@ export default function AdminDashboard({
     setFormImage('/images/products/aks-bullet.jpg');
     setFormInStock(true);
     setFormWeights([
-      { weight: '26 kg', price: 1850, originalPrice: 2000, inStock: true }
+      { weight: '26kg', price: 1850, originalPrice: 2000, inStock: true }
     ]);
     setIsProductModalOpen(true);
   };
@@ -360,20 +360,52 @@ export default function AdminDashboard({
     setFormWeights(
       prod.weights && prod.weights.length > 0
         ? prod.weights.map((w) => ({ ...w }))
-        : [{ weight: prod.defaultWeight || '26 kg', price: 1850, originalPrice: 2000, inStock: true }]
+        : [{ weight: prod.defaultWeight || '26kg', price: 1850, originalPrice: 2000, inStock: true }]
     );
     setIsProductModalOpen(true);
   };
 
-  // File Upload to DataURL
+  // File Upload to DataURL with automatic client-side canvas compression (prevents LocalStorage QuotaExceededError)
   const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          setFormImage(reader.result);
-        }
+      reader.onload = (event) => {
+        const rawUrl = event.target?.result as string;
+        if (!rawUrl) return;
+
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 600;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/jpeg', 0.82);
+            setFormImage(compressed);
+          } else {
+            setFormImage(rawUrl);
+          }
+        };
+        img.onerror = () => {
+          setFormImage(rawUrl);
+        };
+        img.src = rawUrl;
       };
       reader.readAsDataURL(file);
     }
@@ -430,12 +462,12 @@ export default function AdminDashboard({
         origin: formOrigin.trim() || 'Direct Mill Supply, Chennai',
         aging: formAging.trim() || 'Naturally Aged Old Crop',
         description: formDescription.trim() || `${formName} freshly milled direct from Sri Venkateswara Modern Rice Mill.`,
-        image: formImage.trim(),
+        image: formImage.trim() || '/images/products/aks-bullet.jpg',
         badge: formBadge.trim(),
         rating: editingProduct?.rating || 4.9,
         reviewCount: editingProduct?.reviewCount || 1,
         inStock: formInStock,
-        defaultWeight: formWeights[0]?.weight || '26 kg',
+        defaultWeight: formWeights[0]?.weight?.trim() || '26kg',
         weights: formWeights.map((w) => ({
           weight: w.weight.trim(),
           price: Number(w.price),
@@ -1002,11 +1034,14 @@ export default function AdminDashboard({
                       className="bg-white rounded-2xl border border-[#E6E2D8] shadow-sm hover:shadow-md transition overflow-hidden flex flex-col justify-between"
                     >
                       {/* Product Image & Badges */}
-                      <div className="relative h-44 bg-gray-100 overflow-hidden border-b border-gray-100">
+                      <div className="relative h-48 bg-white p-2.5 overflow-hidden border-b border-gray-100 flex items-center justify-center">
                         <img
-                          src={prod.image}
+                          src={prod.image || '/images/products/aks-bullet.jpg'}
                           alt={prod.name}
-                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/images/products/aks-bullet.jpg';
+                          }}
+                          className="max-h-full max-w-full object-contain"
                         />
                         {/* Top Badges */}
                         <div className="absolute top-2 left-2 flex items-center gap-1.5 flex-wrap">
@@ -1040,7 +1075,7 @@ export default function AdminDashboard({
                         {/* Weight Pill */}
                         <div className="absolute bottom-2 right-2">
                           <span className="text-[10px] font-bold bg-black/70 backdrop-blur-xs text-white px-2 py-0.5 rounded font-mono">
-                            {prod.weights.length > 1 ? `${prod.weights.length} Packs` : primaryWeight.weight}
+                            {(prod.weights?.length || 0) > 1 ? `${prod.weights.length} Packs` : (primaryWeight.weight || '26kg')}
                           </span>
                         </div>
                       </div>

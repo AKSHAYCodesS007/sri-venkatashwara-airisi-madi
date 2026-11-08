@@ -183,6 +183,14 @@ export function markProductDeleted(id: string): void {
   } catch {}
 }
 
+export function unmarkProductDeleted(id: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const deleted = getDeletedProductIds().filter((dId) => dId !== id);
+    localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(deleted));
+  } catch {}
+}
+
 export async function getStoreInfo(): Promise<StoreInfo> {
   return STORE_INFO;
 }
@@ -224,23 +232,32 @@ export async function getAllProducts(): Promise<Product[]> {
     }
   }
 
-  // Base list prioritizing cloud, then local storage
-  const baseList = cloudProducts.length > 0 ? cloudProducts : localProducts;
+  // Intelligent merge: combine cloud products and local storage
+  // Local products (including newly added/edited products from Admin) take priority
+  const mergedMap = new Map<string, Product>();
 
-  let merged: Product[];
-  if (hasLocalCache || cloudProducts.length > 0) {
-    // Already customized or cached — do not re-inject deleted products
-    merged = baseList.filter(p => !deletedIds.has(p.id));
-  } else {
-    // First visit: merge default seed PRODUCTS excluding deleted
-    const existingMap = new Map<string, Product>();
-    baseList.forEach(p => existingMap.set(p.id, p));
+  // 1. Add cloud products if available
+  cloudProducts.forEach((p) => {
+    if (!deletedIds.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
 
-    merged = [
-      ...baseList,
-      ...PRODUCTS.filter(p => !existingMap.has(p.id) && !deletedIds.has(p.id))
-    ];
-  }
+  // 2. Add or overlay local products (so admin additions are never lost)
+  localProducts.forEach((p) => {
+    if (!deletedIds.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
+
+  // 3. Ensure baseline default products exist unless explicitly deleted
+  PRODUCTS.forEach((p) => {
+    if (!deletedIds.has(p.id) && !mergedMap.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
+
+  const merged: Product[] = Array.from(mergedMap.values());
 
   if (typeof window !== 'undefined') {
     try {
@@ -303,20 +320,30 @@ export async function getProductById(id: string): Promise<Product | undefined> {
 }
 
 export async function saveProduct(product: Product): Promise<Product[]> {
+  unmarkProductDeleted(product.id);
   const current = await getAllProducts();
   const existingIdx = current.findIndex(p => p.id === product.id);
   let updated: Product[];
 
+  // Normalize weights and default weight
+  const normalizedProduct: Product = {
+    ...product,
+    defaultWeight: product.defaultWeight || (product.weights && product.weights[0]?.weight) || '26kg',
+    weights: Array.isArray(product.weights) && product.weights.length > 0
+      ? product.weights
+      : [{ weight: '26kg', price: 1850, originalPrice: 2000, inStock: true }],
+  };
+
   if (existingIdx >= 0) {
-    updated = current.map((p, idx) => (idx === existingIdx ? product : p));
+    updated = current.map((p, idx) => (idx === existingIdx ? normalizedProduct : p));
   } else {
-    updated = [product, ...current];
+    updated = [normalizedProduct, ...current];
   }
 
   // Attempt Supabase upsert
   if (supabase) {
     try {
-      const row = mapProductToRow(product);
+      const row = mapProductToRow(normalizedProduct);
       await supabase.from('products').upsert([row]);
     } catch (e) {
       console.warn('Supabase save product failed:', e);

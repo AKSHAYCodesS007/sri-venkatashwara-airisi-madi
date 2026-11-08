@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Product } from '@/types';
 import {
   Star,
@@ -27,48 +27,68 @@ export default function ProductCard({
   onDirectWhatsApp,
   currentCartQty = 0,
 }: ProductCardProps) {
-  const [activeWeight, setActiveWeight] = useState<string>(
-    product.defaultWeight || product.weights[0]?.weight || '5kg'
-  );
+  // Normalize weight matching: handles "26kg" vs "26 kg" gracefully
+  const weightsList = Array.isArray(product.weights) && product.weights.length > 0
+    ? product.weights
+    : [{ weight: product.defaultWeight || '26kg', price: 1850, originalPrice: 2000, inStock: true }];
+
+  const initialWeight = useMemo(() => {
+    const target = (product.defaultWeight || '').replace(/\s+/g, '').toLowerCase();
+    const found = weightsList.find(
+      (w) => w.weight.replace(/\s+/g, '').toLowerCase() === target
+    );
+    return found ? found.weight : weightsList[0].weight;
+  }, [product, weightsList]);
+
+  const [activeWeight, setActiveWeight] = useState<string>(initialWeight);
   const [justAdded, setJustAdded] = useState(false);
 
-  const currentWeightObj =
-    product.weights.find((w) => w.weight === activeWeight) ||
-    product.weights[0] || {
-      weight: '5kg',
-      price: 300,
-      originalPrice: 350,
-    };
+  const currentWeightObj = useMemo(() => {
+    return (
+      weightsList.find((w) => w.weight === activeWeight) ||
+      weightsList.find(
+        (w) => w.weight.replace(/\s+/g, '').toLowerCase() === activeWeight.replace(/\s+/g, '').toLowerCase()
+      ) ||
+      weightsList[0]
+    );
+  }, [weightsList, activeWeight]);
 
-  const discountPercent = Math.round(
-    ((currentWeightObj.originalPrice - currentWeightObj.price) /
-      currentWeightObj.originalPrice) *
-      100
+  const hasDiscount = Boolean(
+    currentWeightObj.originalPrice &&
+    currentWeightObj.originalPrice > currentWeightObj.price
   );
+
+  const discountPercent = hasDiscount && currentWeightObj.originalPrice > 0
+    ? Math.round(((currentWeightObj.originalPrice - currentWeightObj.price) / currentWeightObj.originalPrice) * 100)
+    : 0;
 
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart(product, activeWeight, 1);
+    onAddToCart(product, currentWeightObj.weight, 1);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 1200);
   };
 
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDirectWhatsApp(product, activeWeight);
+    onDirectWhatsApp(product, currentWeightObj.weight);
   };
 
   return (
     <div
-      onClick={() => onSelectProduct(product.id, activeWeight)}
+      onClick={() => onSelectProduct(product.id, currentWeightObj.weight)}
       className="group bg-white rounded-xl sm:rounded-2xl border border-[#E6E2D8] hover:border-[#C59B27] shadow-2xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer relative"
     >
       {/* Top Media & Badges Container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F4F1EA]">
+      <div className="relative aspect-square sm:aspect-[4/3] w-full overflow-hidden bg-white p-2.5 flex items-center justify-center border-b border-gray-100">
         <img
-          src={product.image}
+          src={product.image || '/images/products/aks-bullet.jpg'}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          onError={(e) => {
+            e.currentTarget.src = '/images/products/aks-bullet.jpg';
+          }}
+          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300 ease-out"
+          loading="lazy"
         />
 
         {/* Top Badges */}
@@ -80,13 +100,13 @@ export default function ProductCard({
             </span>
           )}
           <span className="bg-[#FEF9EB] text-[#A27B16] border border-[#E6CE8A] text-[8px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-2xs">
-            {product.aging}
+            {product.aging || 'Old Crop'}
           </span>
         </div>
 
         {/* Origin Pill */}
         <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 bg-black/60 backdrop-blur-md text-white text-[8px] sm:text-[10px] font-semibold px-1.5 sm:px-2 py-0.5 rounded truncate max-w-[100px] sm:max-w-none">
-          {product.origin}
+          {product.origin || 'Mill Direct'}
         </div>
 
         {/* Discount Pill */}
@@ -102,13 +122,13 @@ export default function ProductCard({
         <div>
           {/* Rating & Category */}
           <div className="flex items-center justify-between text-[10px] sm:text-xs text-[#7C8D83] mb-1">
-            <span className="text-[9px] sm:text-[11px] font-medium text-[#133E2B] bg-[#EAF3EE] px-1.5 py-0.5 rounded capitalize truncate max-w-[70px] sm:max-w-none">
-              {product.category.replace(/-/g, ' ')}
+            <span className="text-[9px] sm:text-[11px] font-medium text-[#133E2B] bg-[#EAF3EE] px-1.5 py-0.5 rounded capitalize truncate max-w-[90px] sm:max-w-none">
+              {(product.category || 'rice').replace(/-/g, ' ')}
             </span>
             <div className="flex items-center gap-0.5 sm:gap-1 text-[#19241F] font-bold text-[10px] sm:text-xs shrink-0">
               <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-[#C59B27] text-[#C59B27]" />
-              <span>{product.rating.toFixed(1)}</span>
-              <span className="text-gray-400 font-normal text-[9px] sm:text-xs">({product.reviewCount})</span>
+              <span>{(product.rating || 4.9).toFixed(1)}</span>
+              <span className="text-gray-400 font-normal text-[9px] sm:text-xs">({product.reviewCount || 1})</span>
             </div>
           </div>
 
@@ -131,8 +151,8 @@ export default function ProductCard({
               Select Pack Size:
             </div>
             <div className="flex flex-wrap gap-1">
-              {product.weights.map((w) => {
-                const isActive = activeWeight === w.weight;
+              {weightsList.map((w) => {
+                const isActive = (activeWeight || '').replace(/\s+/g, '').toLowerCase() === w.weight.replace(/\s+/g, '').toLowerCase();
                 return (
                   <button
                     type="button"
@@ -158,15 +178,19 @@ export default function ProductCard({
           <div className="flex items-baseline justify-between pt-0.5 flex-wrap gap-1">
             <div className="flex items-baseline gap-1">
               <span className="font-serif text-sm sm:text-xl lg:text-2xl font-black text-[#133E2B]">
-                ₹{currentWeightObj.price}
+                ₹{currentWeightObj.price.toLocaleString('en-IN')}
               </span>
-              <span className="text-[9px] sm:text-xs text-gray-400 line-through font-normal">
-                ₹{currentWeightObj.originalPrice}
-              </span>
+              {hasDiscount && (
+                <span className="text-[9px] sm:text-xs text-gray-400 line-through font-normal">
+                  ₹{(currentWeightObj.originalPrice || 0).toLocaleString('en-IN')}
+                </span>
+              )}
             </div>
-            <span className="text-[8px] sm:text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded font-bold">
-              Save ₹{currentWeightObj.originalPrice - currentWeightObj.price}
-            </span>
+            {hasDiscount && (
+              <span className="text-[8px] sm:text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded font-bold">
+                Save ₹{((currentWeightObj.originalPrice || currentWeightObj.price) - currentWeightObj.price).toLocaleString('en-IN')}
+              </span>
+            )}
           </div>
 
           {/* Action Buttons - Exclusively WhatsApp Ordering */}
@@ -175,7 +199,7 @@ export default function ProductCard({
               type="button"
               onClick={handleWhatsApp}
               className="flex-1 bg-[#25D366] hover:bg-[#20bd5a] active:bg-[#1da850] text-white py-1.5 sm:py-2.5 px-1.5 sm:px-3 rounded-lg sm:rounded-xl font-extrabold text-[10px] sm:text-xs flex items-center justify-center gap-1 sm:gap-2 shadow-xs transition-all cursor-pointer active:scale-95"
-              title={`Direct WhatsApp order for ${product.name} (${activeWeight})`}
+              title={`Direct WhatsApp order for ${product.name} (${currentWeightObj.weight})`}
             >
               <WhatsAppIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" />
               <span className="hidden sm:inline">Order on WhatsApp</span>
