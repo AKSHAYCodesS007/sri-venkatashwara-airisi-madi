@@ -159,8 +159,8 @@ function mapBannerToRow(banner: OfferBanner): any {
 // =============================================================================
 // STORE & CATALOG SERVICES (SUPABASE + LOCAL STORAGE CACHE)
 // =============================================================================
-const PRODUCTS_STORAGE_KEY = 'rice_ecommerce_products_v3';
-const DELETED_PRODUCTS_KEY = 'rice_ecommerce_deleted_products_v3';
+const PRODUCTS_STORAGE_KEY = 'rice_ecommerce_products_v4';
+const DELETED_PRODUCTS_KEY = 'rice_ecommerce_deleted_products_v4';
 
 export function getDeletedProductIds(): string[] {
   if (typeof window === 'undefined') return [];
@@ -232,27 +232,26 @@ export async function getAllProducts(): Promise<Product[]> {
     }
   }
 
-  // Intelligent merge: combine cloud products and local storage
-  // Local products (including newly added/edited products from Admin) take priority
+  // Canonical merge: Baseline 18 products from seed-data + Cloud Supabase + Local Admin updates
   const mergedMap = new Map<string, Product>();
 
-  // 1. Add cloud products if available
+  // 1. Baseline: 18 real mill products
+  PRODUCTS.forEach((p) => {
+    if (!deletedIds.has(p.id)) {
+      mergedMap.set(p.id, p);
+    }
+  });
+
+  // 2. Overlay live Supabase products
   cloudProducts.forEach((p) => {
     if (!deletedIds.has(p.id)) {
       mergedMap.set(p.id, p);
     }
   });
 
-  // 2. Add or overlay local products (so admin additions are never lost)
+  // 3. Overlay any locally added or modified products from Admin
   localProducts.forEach((p) => {
     if (!deletedIds.has(p.id)) {
-      mergedMap.set(p.id, p);
-    }
-  });
-
-  // 3. Ensure baseline default products exist unless explicitly deleted
-  PRODUCTS.forEach((p) => {
-    if (!deletedIds.has(p.id) && !mergedMap.has(p.id)) {
       mergedMap.set(p.id, p);
     }
   });
