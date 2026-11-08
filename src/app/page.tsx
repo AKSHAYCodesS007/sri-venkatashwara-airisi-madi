@@ -232,19 +232,34 @@ export default function Home() {
       handleRemoveCartItem(cartItemId);
     } else {
       setCartItems((prev) =>
-        prev.map((item) =>
-          item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item
-        )
+        prev.map((item) => {
+          const currentKey = item.cartItemId || (item.productId + '_' + item.weight);
+          return (currentKey === cartItemId || item.cartItemId === cartItemId)
+            ? { ...item, quantity: newQty }
+            : item;
+        })
       );
     }
   };
 
   const handleRemoveCartItem = (cartItemId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
+    setCartItems((prev) =>
+      prev.filter((item) => {
+        const currentKey = item.cartItemId || (item.productId + '_' + item.weight);
+        return currentKey !== cartItemId && item.cartItemId !== cartItemId;
+      })
+    );
+    showToast('Item removed from shopping bag.');
   };
 
   const handleClearCart = () => {
     setCartItems([]);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem(CART_STORAGE_KEY);
+      } catch {}
+    }
+    showToast('Shopping bag cleared.');
   };
 
   const totalCartCount = useMemo(() => {

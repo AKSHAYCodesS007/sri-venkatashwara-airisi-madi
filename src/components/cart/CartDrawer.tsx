@@ -221,12 +221,26 @@ export default function CartDrawer({
                 {cartItems.reduce((acc, i) => acc + i.quantity, 0)}
               </span>
             </div>
-            <button
-              onClick={onClose}
-              className="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {cartItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={onClearCart}
+                  className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded hover:bg-white/10 transition cursor-pointer flex items-center gap-1"
+                  title="Remove all items from bag"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Clear All</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Exclusive Chennai Delivery Notice */}
@@ -269,25 +283,38 @@ export default function CartDrawer({
                   {/* Quantity & Delete Controls */}
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
                     <button
-                      onClick={() => onRemoveItem(item.cartItemId)}
-                      className="text-gray-400 hover:text-red-600 transition p-1 cursor-pointer"
-                      title="Remove item"
+                      type="button"
+                      onClick={() => onRemoveItem(item.cartItemId || `${item.productId}_${item.weight}`)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 transition px-2 py-1 rounded-lg cursor-pointer flex items-center gap-1 border border-red-100 hover:border-red-200"
+                      title="Delete item from bag"
+                      aria-label="Delete item from bag"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-bold">Delete</span>
                     </button>
                     <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-0.5 bg-gray-50">
                       <button
-                        onClick={() => onUpdateQuantity(item.cartItemId, item.quantity - 1)}
-                        className="w-5 h-5 flex items-center justify-center font-bold text-gray-600 hover:text-black cursor-pointer"
+                        type="button"
+                        onClick={() => onUpdateQuantity(item.cartItemId || `${item.productId}_${item.weight}`, item.quantity - 1)}
+                        className="w-6 h-6 flex items-center justify-center font-bold text-gray-600 hover:text-black hover:bg-gray-200 rounded cursor-pointer transition"
+                        title={item.quantity === 1 ? 'Delete item' : 'Decrease quantity'}
+                        aria-label="Decrease quantity"
                       >
-                        -
+                        {item.quantity === 1 ? (
+                          <Trash2 className="w-3 h-3 text-red-500" />
+                        ) : (
+                          '-'
+                        )}
                       </button>
-                      <span className="text-xs font-bold px-1 min-w-[16px] text-center">
+                      <span className="text-xs font-bold px-1.5 min-w-[20px] text-center select-none">
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => onUpdateQuantity(item.cartItemId, item.quantity + 1)}
-                        className="w-5 h-5 flex items-center justify-center font-bold text-gray-600 hover:text-black cursor-pointer"
+                        type="button"
+                        onClick={() => onUpdateQuantity(item.cartItemId || `${item.productId}_${item.weight}`, item.quantity + 1)}
+                        className="w-6 h-6 flex items-center justify-center font-bold text-gray-600 hover:text-black hover:bg-gray-200 rounded cursor-pointer transition"
+                        title="Increase quantity"
+                        aria-label="Increase quantity"
                       >
                         +
                       </button>

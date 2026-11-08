@@ -160,12 +160,35 @@ function mapBannerToRow(banner: OfferBanner): any {
 // STORE & CATALOG SERVICES (SUPABASE + LOCAL STORAGE CACHE)
 // =============================================================================
 const PRODUCTS_STORAGE_KEY = 'rice_ecommerce_products_v3';
+const DELETED_PRODUCTS_KEY = 'rice_ecommerce_deleted_products_v3';
+
+export function getDeletedProductIds(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const saved = localStorage.getItem(DELETED_PRODUCTS_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function markProductDeleted(id: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const deleted = getDeletedProductIds();
+    if (!deleted.includes(id)) {
+      deleted.push(id);
+      localStorage.setItem(DELETED_PRODUCTS_KEY, JSON.stringify(deleted));
+    }
+  } catch {}
+}
 
 export async function getStoreInfo(): Promise<StoreInfo> {
   return STORE_INFO;
 }
 
 export async function getAllProducts(): Promise<Product[]> {
+  const deletedIds = new Set(getDeletedProductIds());
   let cloudProducts: Product[] = [];
 
   // 1. Try Supabase if table exists
@@ -177,7 +200,7 @@ export async function getAllProducts(): Promise<Product[]> {
         .order('name', { ascending: true });
 
       if (!error && Array.isArray(data) && data.length > 0) {
-        cloudProducts = data.map(mapProductFromRow);
+        cloudProducts = data.map(mapProductFromRow).filter(p => !deletedIds.has(p.id));
       }
     } catch {
       // Fallback to local storage or seed data
@@ -186,13 +209,14 @@ export async function getAllProducts(): Promise<Product[]> {
 
   // 2. Check localStorage
   let localProducts: Product[] = [];
+  const hasLocalCache = typeof window !== 'undefined' && localStorage.getItem(PRODUCTS_STORAGE_KEY) !== null;
   if (typeof window !== 'undefined') {
     try {
       const saved = localStorage.getItem(PRODUCTS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          localProducts = parsed;
+        if (Array.isArray(parsed)) {
+          localProducts = parsed.filter((p: Product) => !deletedIds.has(p.id));
         }
       }
     } catch (e) {
@@ -201,16 +225,22 @@ export async function getAllProducts(): Promise<Product[]> {
   }
 
   // Base list prioritizing cloud, then local storage
-  const baseList = cloudProducts.length > 0 ? cloudProducts : (localProducts.length > 0 ? localProducts : []);
+  const baseList = cloudProducts.length > 0 ? cloudProducts : localProducts;
 
-  // Guarantee that default seed PRODUCTS are never missing
-  const existingMap = new Map<string, Product>();
-  baseList.forEach(p => existingMap.set(p.id, p));
+  let merged: Product[];
+  if (hasLocalCache || cloudProducts.length > 0) {
+    // Already customized or cached — do not re-inject deleted products
+    merged = baseList.filter(p => !deletedIds.has(p.id));
+  } else {
+    // First visit: merge default seed PRODUCTS excluding deleted
+    const existingMap = new Map<string, Product>();
+    baseList.forEach(p => existingMap.set(p.id, p));
 
-  const merged = [
-    ...baseList,
-    ...PRODUCTS.filter(p => !existingMap.has(p.id))
-  ];
+    merged = [
+      ...baseList,
+      ...PRODUCTS.filter(p => !existingMap.has(p.id) && !deletedIds.has(p.id))
+    ];
+  }
 
   if (typeof window !== 'undefined') {
     try {
@@ -306,6 +336,7 @@ export async function saveProduct(product: Product): Promise<Product[]> {
 }
 
 export async function deleteProduct(id: string): Promise<Product[]> {
+  markProductDeleted(id);
   const current = await getAllProducts();
   const updated = current.filter(p => p.id !== id);
 
@@ -331,6 +362,7 @@ export async function deleteProduct(id: string): Promise<Product[]> {
 export async function resetProducts(): Promise<Product[]> {
   if (typeof window !== 'undefined') {
     try {
+      localStorage.removeItem(DELETED_PRODUCTS_KEY);
       localStorage.removeItem(PRODUCTS_STORAGE_KEY);
     } catch {}
   }
